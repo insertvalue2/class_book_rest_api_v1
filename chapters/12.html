@@ -1,0 +1,1765 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"><meta name="viewport" content="width=device-width,initial-scale=1"><title>스프링부트4로배우는 REST API </title><link rel="stylesheet" href="../assets/book-5206c2e7258828b8.css"></head><body><div class="reader" data-toc="open"><header class="book-bar"><button type="button" class="toc-toggle" aria-expanded="true" aria-controls="toc">목차</button><span class="book-bar__title">스프링부트4로배우는 REST API </span></header><aside class="toc" id="toc"><p class="caption">목차 / CONTENTS</p><div class="toc-title">스프링부트4로배우는 REST API </div><a href="../index.html" data-chapter="0" title="표지" aria-current="false">표지</a><a href="01.html" data-chapter="1" title="1장. Spring Boot 실행 환경" aria-current="false">1장. Spring Boot 실행 환경</a><a href="02.html" data-chapter="2" title="2장. 빈과 의존성 주입이란?" aria-current="false">2장. 빈과 의존성 주입이란?</a><a href="03.html" data-chapter="3" title="3장. REST API란?" aria-current="false">3장. REST API란?</a><a href="04.html" data-chapter="4" title="4장. 데이터베이스와 SQL이란?" aria-current="false">4장. 데이터베이스와 SQL이란?</a><a href="05.html" data-chapter="5" title="5장. JPA 엔티티란?" aria-current="false">5장. JPA 엔티티란?</a><a href="06.html" data-chapter="6" title="6장. REST API 계층 구조란?" aria-current="false">6장. REST API 계층 구조란?</a><a href="07.html" data-chapter="7" title="7장. 예외 처리란?" aria-current="false">7장. 예외 처리란?</a><a href="08.html" data-chapter="8" title="8장. 페이징이란?" aria-current="false">8장. 페이징이란?</a><a href="09.html" data-chapter="9" title="9장. Spring Security란?" aria-current="false">9장. Spring Security란?</a><a href="10.html" data-chapter="10" title="10장. 비밀번호 암호화란?" aria-current="false">10장. 비밀번호 암호화란?</a><a href="11.html" data-chapter="11" title="11장. 입력값 검증이란?" aria-current="false">11장. 입력값 검증이란?</a><a href="12.html" data-chapter="12" title="12장. JWT란?" aria-current="true">12장. JWT란?</a><a href="13.html" data-chapter="13" title="13장. CORS란?" aria-current="false">13장. CORS란?</a><a href="14.html" data-chapter="14" title="14장. 인증 필터란?" aria-current="false">14장. 인증 필터란?</a><a href="15.html" data-chapter="15" title="15장. 인가란?" aria-current="false">15장. 인가란?</a><a href="16.html" data-chapter="16" title="16장. 양방향 연관관계란?" aria-current="false">16장. 양방향 연관관계란?</a><a href="17.html" data-chapter="17" title="17장. 내 글 표시와 내 정보 수정" aria-current="false">17장. 내 글 표시와 내 정보 수정</a><a href="18.html" data-chapter="18" title="18장. 역할 기반 접근 제어란?" aria-current="false">18장. 역할 기반 접근 제어란?</a><a href="19.html" data-chapter="19" title="19장. 리프레시 토큰이란?" aria-current="false">19장. 리프레시 토큰이란?</a><a href="20.html" data-chapter="20" title="20장. 블로그 API 완성 점검" aria-current="false">20장. 블로그 API 완성 점검</a><a href="21.html" data-chapter="21" title="21장. 프로필이란?" aria-current="false">21장. 프로필이란?</a><a href="22.html" data-chapter="22" title="22장. 환경 변수란?" aria-current="false">22장. 환경 변수란?</a><a href="23.html" data-chapter="23" title="23장. 파일 업로드란?" aria-current="false">23장. 파일 업로드란?</a><a href="24.html" data-chapter="24" title="24장. API 문서란?" aria-current="false">24장. API 문서란?</a><a href="25.html" data-chapter="25" title="25장. 단위 테스트란?" aria-current="false">25장. 단위 테스트란?</a><a href="26.html" data-chapter="26" title="26장. 통합 테스트란?" aria-current="false">26장. 통합 테스트란?</a><footer>26장</footer></aside><main class="reading"><section class="chapter" id="chapter-12"><div class="eyebrow">스프링부트4로배우는 REST API  / CHAPTER 12</div><span class="chapter-num" aria-hidden="true">12</span><h2>12장. JWT란?</h2><h3>1. 토큰 인증의 개념</h3>
+<h4>1.1 세션 방식과 토큰 방식</h4>
+<p>11장까지 만든 블로그 API에는 회원가입은 있지만 로그인이 없습니다. 로그인은 사용자가 아이디와 비밀번호로 자기가 누구인지 증명하는 일입니다. 어려운 부분은 로그인한 다음입니다. HTTP는 요청 하나가 끝나면 앞의 요청을 기억하지 않습니다. 그래서 로그인 뒤에 오는 요청마다 서버는 그 요청을 누가 보냈는지 다시 알아내야 합니다. 이 일을 하는 방법에는 세션 방식과 토큰 방식이 있습니다.</p>
+<p><strong>세션(session)</strong> 방식에서는 서버가 로그인 정보를 저장합니다. 로그인에 성공하면 서버는 자기 메모리에 세션을 만듭니다. 그리고 그 세션을 찾는 열쇠인 세션 아이디를 쿠키에 담아 브라우저에 보냅니다. 브라우저가 다음 요청에 쿠키를 실어 보내면, 서버는 세션 아이디로 저장해 둔 로그인 정보를 찾습니다.</p>
+<p><strong>토큰(token)</strong> 방식에서는 서버가 로그인 정보를 저장하지 않습니다. 로그인에 성공하면 서버는 사용자 정보를 담은 문자열에 서명해 토큰으로 내줍니다. 클라이언트는 이 토큰을 보관하다가 요청마다 함께 보냅니다. 서버는 서명이 자기가 만든 것인지 확인한 뒤, 토큰 안의 정보로 사용자를 알아냅니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-50a68104284b"><div class="figure-scroll"><img src="../assets/img/b5b132c4fe7b2cbf.png" alt="세션 방식과 토큰 방식" data-raster="true"/></div><figcaption>세션 방식과 토큰 방식</figcaption></figure>
+<p>그림 12-1처럼 두 방식은 로그인 정보를 어디에 보관하는지가 다릅니다. 나머지 차이는 다음 표와 같습니다.</p>
+<table><thead><tr><th>구분</th><th>세션 방식</th><th>토큰 방식</th></tr></thead><tbody><tr><td>로그인 정보 보관</td><td>서버 메모리(세션 저장소)</td><td>클라이언트(토큰)</td></tr><tr><td>요청에 실어 보내는 것</td><td>세션 아이디(쿠키)</td><td>토큰(요청 헤더)</td></tr><tr><td>서버가 확인하는 것</td><td>세션 저장소에 세션이 있는가</td><td>토큰의 서명이 올바른가</td></tr><tr><td>서버를 여러 대로 늘릴 때</td><td>서버끼리 세션을 나눠 가져야 한다</td><td>같은 서명 키만 있으면 된다</td></tr><tr><td>강제 로그아웃</td><td>세션을 지우면 끝난다</td><td>발급한 토큰은 만료 전까지 유효하다</td></tr></tbody></table>
+<p>이 책의 블로그 API는 React로 만든 별도 화면이 호출하는 REST API이므로 토큰 방식을 씁니다. 표의 마지막 줄처럼 토큰 방식에는 이미 내준 토큰을 서버가 거둬들이기 어렵다는 약점이 있습니다. 이 약점은 19장에서 리프레시 토큰을 만들며 보완합니다.</p>
+<h4>1.2 JWT의 구조(헤더 · 페이로드 · 서명)</h4>
+<p><strong>JWT(JSON Web Token)</strong>는 토큰 방식에서 가장 널리 쓰는 토큰 형식입니다. JSON으로 쓴 정보를 문자열로 바꾸고 서명을 붙인 다음, 점(<code>.</code>)으로 구분한 세 부분으로 만듭니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="헤더.페이로드.서명">헤더.페이로드.서명</code></pre></div></div>
+<p><strong>헤더(header)</strong>에는 토큰 종류와 서명 알고리즘이 들어갑니다. 이 장에서 만드는 토큰의 헤더는 <code>{&quot;alg&quot;:&quot;HS512&quot;,&quot;typ&quot;:&quot;JWT&quot;}</code> 모양입니다. <code>HS512</code>는 HMAC-SHA512 알고리즘입니다. 비밀 키 하나로 서명하고, 확인할 때도 같은 키를 씁니다. 3장에서 본 HTTP 헤더와는 이름만 같고 다른 것입니다. 여기서 말하는 헤더는 토큰 문자열의 첫 부분입니다.</p>
+<p><strong>페이로드(payload)</strong>에는 토큰에 담을 정보가 들어갑니다. 페이로드에 넣는 이름과 값 한 쌍을 <strong>클레임(claim)</strong>이라고 합니다. <code>sub</code>(토큰 주인)나 <code>exp</code>(만료 시각)처럼 표준에서 이름을 정해 둔 클레임이 있습니다. <code>id</code>나 <code>username</code>처럼 애플리케이션이 정한 클레임도 넣을 수 있습니다.</p>
+<p><strong>서명(signature)</strong>은 헤더와 페이로드를 서버만 아는 비밀 키로 계산한 값입니다. 누군가 페이로드의 <code>id</code>를 1에서 2로 바꾸면 서명도 다시 계산해야 합니다. 하지만 비밀 키가 없으므로 맞는 서명을 만들 수 없습니다. 서버는 받은 헤더와 페이로드로 서명을 다시 계산하고, 토큰에 붙은 서명과 다르면 위조된 토큰으로 판단합니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-8758eed2bb4a"><div class="figure-scroll"><img src="../assets/img/4081d59a10c03543.png" alt="JWT의 세 부분" data-raster="true"/></div><figcaption>JWT의 세 부분</figcaption></figure>
+<p>헤더와 페이로드는 암호화된 것이 아닙니다. Base64URL로 인코딩만 했기 때문에 토큰을 가진 사람은 누구나 디코딩해서 내용을 읽을 수 있습니다. 서명이 보장하는 것은 내용이 바뀌지 않았다는 사실뿐입니다. 그러므로 페이로드에 비밀번호나 개인정보를 넣으면 안 됩니다.</p>
+<h4>1.3 Authorization 헤더와 Bearer</h4>
+<p>클라이언트는 토큰을 HTTP 요청 헤더 <code>Authorization</code>에 담아 보냅니다. 값은 <code>Bearer</code>라는 말 뒤에 공백 한 칸을 두고 토큰을 붙인 형태입니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="Authorization: Bearer 헤더.페이로드.서명">Authorization: Bearer 헤더.페이로드.서명</code></pre></div></div>
+<p><code>Bearer</code>는 &#x27;소지자&#x27;라는 뜻입니다. 이 토큰을 가진 사람에게 권한을 준다는 의미로 붙입니다. 서버는 토큰을 누가 보냈는지 따지지 않고 토큰이 올바른지만 봅니다. 그래서 토큰이 남에게 새면 그 사람이 토큰 주인 행세를 할 수 있습니다. 토큰에 만료 시간을 두는 것도 이 때문입니다.</p>
+<p>이 책에서는 로그인에 성공하면 서버가 응답 헤더 <code>Authorization</code>에 <code>Bearer </code>까지 붙인 토큰을 담아 보냅니다. 클라이언트는 이 값을 그대로 보관했다가 다음 요청의 <code>Authorization</code> 헤더에 넣으면 됩니다. 서버가 요청 헤더에서 토큰을 꺼내 검증하는 코드는 14장에서 만듭니다.</p>
+<h3>2. 로그인 API</h3>
+<h4>2.1 findByUsername과 matches</h4>
+<p>로그인은 두 단계로 확인합니다. 먼저 요청에 들어온 유저네임으로 회원을 찾습니다. 그다음 찾은 회원의 비밀번호가 요청의 비밀번호와 맞는지 확인합니다.</p>
+<p>회원 찾기에는 11장에서 본 쿼리 메서드를 씁니다. 메서드 이름을 <code>findByUsername</code>으로 지으면 Spring Data JPA가 <code>username</code> 필드로 회원을 찾는 쿼리를 만들어 줍니다. 그 유저네임의 회원이 없을 수도 있으므로 반환 타입은 <code>Optional&lt;User&gt;</code>로 둡니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code class="language-java" data-code="Optional&lt;User&gt; findByUsername(String username);"><span class="token class-name">Optional</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">User</span><span class="token punctuation">></span></span> <span class="token function">findByUsername</span><span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div></div>
+<p>비밀번호는 <code>==</code>나 <code>equals()</code>로 비교할 수 없습니다. DB에는 10장에서 BCrypt로 해시한 값이 저장되어 있습니다. BCrypt는 해시할 때마다 솔트를 새로 만들기 때문에 같은 비밀번호라도 결과가 매번 다릅니다. 그래서 <code>PasswordEncoder</code>의 <code>matches()</code>로 비교합니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code class="language-java" data-code="boolean 일치여부 = passwordEncoder.matches(평문비밀번호, 저장된해시값);"><span class="token keyword">boolean</span> 일치여부 <span class="token operator">=</span> passwordEncoder<span class="token punctuation">.</span><span class="token function">matches</span><span class="token punctuation">(</span>평문비밀번호<span class="token punctuation">,</span> 저장된해시값<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div></div>
+<p><code>matches()</code>는 저장된 해시값 안에 들어 있는 솔트를 꺼냅니다. 그 솔트로 평문 비밀번호를 다시 해시한 뒤 두 값을 비교합니다. 인자 순서를 바꾸면 항상 <code>false</code>가 나오므로, 첫 번째에는 평문을, 두 번째에는 해시값을 넣습니다.</p>
+<h4>2.2 UnauthorizedException과 401</h4>
+<p>유저네임이 없거나 비밀번호가 틀리면 로그인에 실패한 것입니다. 인증 실패를 뜻하는 HTTP 상태 코드는 <strong>401</strong>입니다. 이름은 <code>Unauthorized</code>이지만 뜻은 &quot;누구인지 확인되지 않았다&quot;입니다. 누구인지는 확인됐지만 권한이 없는 경우에는 403을 씁니다. 이 구분은 15장에서 다시 다룹니다.</p>
+<p>401용 예외는 7장의 <code>NotFoundException</code>, 11장의 <code>BadRequestException</code>과 같은 방식으로 만듭니다. 그리고 <code>GlobalExceptionHandler</code>에 처리기를 하나 추가합니다. Service는 실패하면 예외를 던지기만 하고, 응답 모양은 처리기가 정합니다.</p>
+<p><strong>예제 12-1 — 로그인 API 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 11-6</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/handler/errors/UnauthorizedException.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.handler.errors;
+
+public class UnauthorizedException extends RuntimeException {
+
+    public UnauthorizedException(String message) {
+        super(message);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UnauthorizedException</span> <span class="token keyword">extends</span> <span class="token class-name">RuntimeException</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">UnauthorizedException</span><span class="token punctuation">(</span><span class="token class-name">String</span> message<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>message<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/handler/GlobalExceptionHandler.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.handler;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import com.newtenco.blog.core.handler.errors.NotFoundException;
+import com.newtenco.blog.core.handler.errors.UnauthorizedException;
+import com.newtenco.blog.core.util.Resp;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;?&gt; validation(MethodArgumentNotValidException e) {
+        FieldError fe = e.getBindingResult().getFieldErrors().getFirst();
+        return Resp.fail(HttpStatus.BAD_REQUEST, fe.getDefaultMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity&lt;?&gt; missingParam(MissingServletRequestParameterException e) {
+        return Resp.fail(HttpStatus.BAD_REQUEST, e.getParameterName() + &quot;:값을 입력해주세요&quot;);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity&lt;?&gt; ex400(BadRequestException e) {
+        return Resp.fail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity&lt;?&gt; ex401(UnauthorizedException e) {
+        return Resp.fail(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity&lt;?&gt; ex404(NotFoundException e) {
+        return Resp.fail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;?&gt; exUnknown(Exception e) {
+        if (e instanceof ErrorResponse er) {
+            HttpStatus status = HttpStatus.valueOf(er.getStatusCode().value());
+            return Resp.fail(status, status.getReasonPhrase());
+        }
+        log.error(&quot;예상하지 못한 오류&quot;, e);
+        return Resp.fail(HttpStatus.INTERNAL_SERVER_ERROR, &quot;관리자에게 문의하세요&quot;);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">NotFoundException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">UnauthorizedException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span>extern<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">Slf4j</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpStatus</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">FieldError</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span></span><span class="token class-name">ErrorResponse</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span></span><span class="token class-name">MethodArgumentNotValidException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span></span><span class="token class-name">MissingServletRequestParameterException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">ExceptionHandler</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestControllerAdvice</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Slf4j</span>
+<span class="token annotation punctuation">@RestControllerAdvice</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">GlobalExceptionHandler</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">validation</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">FieldError</span> fe <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">getBindingResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFieldErrors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFirst</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> fe<span class="token punctuation">.</span><span class="token function">getDefaultMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">MissingServletRequestParameterException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">missingParam</span><span class="token punctuation">(</span><span class="token class-name">MissingServletRequestParameterException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getParameterName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">":값을 입력해주세요"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">BadRequestException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex400</span><span class="token punctuation">(</span><span class="token class-name">BadRequestException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">UnauthorizedException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex401</span><span class="token punctuation">(</span><span class="token class-name">UnauthorizedException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">UNAUTHORIZED</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex404</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">NOT_FOUND</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">Exception</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">exUnknown</span><span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>e <span class="token keyword">instanceof</span> <span class="token class-name">ErrorResponse</span> er<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">HttpStatus</span> status <span class="token operator">=</span> <span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>er<span class="token punctuation">.</span><span class="token function">getStatusCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span>status<span class="token punctuation">,</span> status<span class="token punctuation">.</span><span class="token function">getReasonPhrase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"예상하지 못한 오류"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">INTERNAL_SERVER_ERROR</span><span class="token punctuation">,</span> <span class="token string">"관리자에게 문의하세요"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserRepository.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository&lt;User, Integer&gt; {
+
+    boolean existsByUsername(String username);
+
+    Optional&lt;User&gt; findByUsername(String username);
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>data<span class="token punctuation">.</span>jpa<span class="token punctuation">.</span>repository<span class="token punctuation">.</span></span><span class="token class-name">JpaRepository</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Optional</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">UserRepository</span> <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">User</span><span class="token punctuation">,</span> <span class="token class-name">Integer</span><span class="token punctuation">></span></span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">boolean</span> <span class="token function">existsByUsername</span><span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token class-name">Optional</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">User</span><span class="token punctuation">></span></span> <span class="token function">findByUsername</span><span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserRequest.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class UserRequest {
+
+    public record JoinDTO(
+            @NotBlank(message = &quot;유저네임을 입력해주세요&quot;)
+            @Size(min = 4, max = 20, message = &quot;유저네임은 4~20자여야 합니다&quot;)
+            String username,
+
+            @NotBlank(message = &quot;비밀번호를 입력해주세요&quot;)
+            @Size(min = 4, max = 20, message = &quot;비밀번호는 4~20자여야 합니다&quot;)
+            String password,
+
+            @NotBlank(message = &quot;이메일을 입력해주세요&quot;)
+            @Email(message = &quot;이메일 형식이 올바르지 않습니다&quot;)
+            String email) {
+
+        public User toEntity(String encPassword) {
+            return User.builder()
+                    .username(username)
+                    .password(encPassword)
+                    .email(email)
+                    .build();
+        }
+    }
+
+    public record LoginDTO(String username, String password) {
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">Email</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">NotBlank</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">Size</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserRequest</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">JoinDTO</span><span class="token punctuation">(</span>
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"유저네임을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">,</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"유저네임은 4~20자여야 합니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> username<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"비밀번호를 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">,</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"비밀번호는 4~20자여야 합니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> password<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"이메일을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Email</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"이메일 형식이 올바르지 않습니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> email<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token class-name">User</span> <span class="token function">toEntity</span><span class="token punctuation">(</span><span class="token class-name">String</span> encPassword<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token class-name">User</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">email</span><span class="token punctuation">(</span>email<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">LoginDTO</span><span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">,</span> <span class="token class-name">String</span> password<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserService.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import com.newtenco.blog.core.handler.errors.UnauthorizedException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+// 회원 기능(가입 · 로그인 · 중복 확인)의 업무 규칙을 맡는 서비스
+// @Transactional(readOnly = true): 기본은 읽기 전용 트랜잭션. 데이터를 바꾸는 메서드에만 @Transactional을 다시 붙인다
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class UserService {
+
+    // 두 객체 모두 @RequiredArgsConstructor가 만든 생성자로 스프링이 주입한다
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    // 회원을 저장하므로 쓰기 가능한 트랜잭션으로 실행한다
+    @Transactional
+    public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
+        // 같은 유저네임이 있으면 400으로 거절한다. 느린 BCrypt 계산보다 먼저 검사한다
+        if (userRepository.existsByUsername(reqDTO.username())) {
+            throw new BadRequestException(&quot;이미 존재하는 유저네임입니다&quot;);
+        }
+        // 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다
+        // 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다
+        String encPassword = passwordEncoder.encode(reqDTO.password());
+        User savedUser = userRepository.save(reqDTO.toEntity(encPassword));
+        // 응답 DTO에는 비밀번호가 없다
+        return new UserResponse.DTO(savedUser);
+    }
+
+    // 조회만 하므로 클래스의 읽기 전용 트랜잭션을 그대로 쓴다
+    public UserResponse.DTO 로그인(UserRequest.LoginDTO reqDTO) {
+        // 1단계: 유저네임으로 회원을 찾는다. 없으면 401
+        User user = userRepository.findByUsername(reqDTO.username())
+                .orElseThrow(() -&gt; new UnauthorizedException(&quot;유저네임 혹은 비밀번호가 일치하지 않습니다&quot;));
+
+        // 2단계: matches(입력한 비밀번호, 저장된 해시)로 비교한다. 틀리면 401
+        // 저장된 해시 안의 솔트로 입력값을 다시 해시해 비교하므로 equals()로는 비교할 수 없다
+        // 두 실패에 같은 메시지를 쓴다. 나누면 어떤 유저네임이 가입돼 있는지 공격자에게 알려 주게 된다
+        if (!passwordEncoder.matches(reqDTO.password(), user.getPassword())) {
+            throw new UnauthorizedException(&quot;유저네임 혹은 비밀번호가 일치하지 않습니다&quot;);
+        }
+        // 지금은 회원 정보만 돌려준다. 토큰은 예제 12-4에서 더한다
+        return new UserResponse.DTO(user);
+    }
+
+    // 가입 화면에서 미리 확인하는 용도다. 이미 있으면 false, 없으면 true를 돌려준다
+    public UserResponse.AvailableDTO 유저네임중복체크(String username) {
+        boolean available = !userRepository.existsByUsername(username);
+        return new UserResponse.AvailableDTO(available);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">UnauthorizedException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>crypto<span class="token punctuation">.</span>password<span class="token punctuation">.</span></span><span class="token class-name">PasswordEncoder</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>transaction<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Transactional</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">// 회원 기능(가입 · 로그인 · 중복 확인)의 업무 규칙을 맡는 서비스</span>
+<span class="token comment">// @Transactional(readOnly = true): 기본은 읽기 전용 트랜잭션. 데이터를 바꾸는 메서드에만 @Transactional을 다시 붙인다</span>
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@Transactional</span><span class="token punctuation">(</span>readOnly <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserService</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// 두 객체 모두 @RequiredArgsConstructor가 만든 생성자로 스프링이 주입한다</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserRepository</span> userRepository<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">PasswordEncoder</span> passwordEncoder<span class="token punctuation">;</span>
+
+    <span class="token comment">// 회원을 저장하므로 쓰기 가능한 트랜잭션으로 실행한다</span>
+    <span class="token annotation punctuation">@Transactional</span>
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token constant">DTO</span> 회원가입<span class="token punctuation">(</span><span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 같은 유저네임이 있으면 400으로 거절한다. 느린 BCrypt 계산보다 먼저 검사한다</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">BadRequestException</span><span class="token punctuation">(</span><span class="token string">"이미 존재하는 유저네임입니다"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다</span>
+        <span class="token comment">// 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다</span>
+        <span class="token class-name">String</span> encPassword <span class="token operator">=</span> passwordEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">User</span> savedUser <span class="token operator">=</span> userRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">toEntity</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 응답 DTO에는 비밀번호가 없다</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token function">DTO</span><span class="token punctuation">(</span>savedUser<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 조회만 하므로 클래스의 읽기 전용 트랜잭션을 그대로 쓴다</span>
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token constant">DTO</span> 로그인<span class="token punctuation">(</span><span class="token class-name">UserRequest<span class="token punctuation">.</span>LoginDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 1단계: 유저네임으로 회원을 찾는다. 없으면 401</span>
+        <span class="token class-name">User</span> user <span class="token operator">=</span> userRepository<span class="token punctuation">.</span><span class="token function">findByUsername</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">orElseThrow</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token keyword">new</span> <span class="token class-name">UnauthorizedException</span><span class="token punctuation">(</span><span class="token string">"유저네임 혹은 비밀번호가 일치하지 않습니다"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 2단계: matches(입력한 비밀번호, 저장된 해시)로 비교한다. 틀리면 401</span>
+        <span class="token comment">// 저장된 해시 안의 솔트로 입력값을 다시 해시해 비교하므로 equals()로는 비교할 수 없다</span>
+        <span class="token comment">// 두 실패에 같은 메시지를 쓴다. 나누면 어떤 유저네임이 가입돼 있는지 공격자에게 알려 주게 된다</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>passwordEncoder<span class="token punctuation">.</span><span class="token function">matches</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getPassword</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">UnauthorizedException</span><span class="token punctuation">(</span><span class="token string">"유저네임 혹은 비밀번호가 일치하지 않습니다"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 지금은 회원 정보만 돌려준다. 토큰은 예제 12-4에서 더한다</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token function">DTO</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 가입 화면에서 미리 확인하는 용도다. 이미 있으면 false, 없으면 true를 돌려준다</span>
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>AvailableDTO</span> 유저네임중복체크<span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">boolean</span> available <span class="token operator">=</span> <span class="token operator">!</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>AvailableDTO</span><span class="token punctuation">(</span>available<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.util.Resp;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    @PostMapping(&quot;/join&quot;)
+    public ResponseEntity&lt;?&gt; join(@Valid @RequestBody UserRequest.JoinDTO reqDTO) {
+        return Resp.ok(userService.회원가입(reqDTO));
+    }
+
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;?&gt; login(@RequestBody UserRequest.LoginDTO reqDTO) {
+        return Resp.ok(userService.로그인(reqDTO));
+    }
+
+    @GetMapping(&quot;/check-username&quot;)
+    public ResponseEntity&lt;?&gt; checkUsername(@RequestParam(&quot;username&quot;) String username) {
+        return Resp.ok(userService.유저네임중복체크(username));
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">Valid</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">GetMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">PostMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestBody</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestParam</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserService</span> userService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/join"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">join</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>회원가입<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">login</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>LoginDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>로그인<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/check-username"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">checkUsername</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestParam</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>유저네임중복체크<span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>서버를 다시 띄우면 H2 메모리 DB가 비워지므로, 비밀번호를 알고 있는 회원을 먼저 가입시킵니다. Postman에서 <code>POST http://localhost:8080/join</code>을 고르고, Body › raw › JSON에 <code>{&quot;username&quot;:&quot;love&quot;,&quot;password&quot;:&quot;1234&quot;,&quot;email&quot;:&quot;love@nate.com&quot;}</code>을 넣어 보냅니다. 이어서 <code>POST http://localhost:8080/login</code>에 <code>{&quot;username&quot;:&quot;love&quot;,&quot;password&quot;:&quot;1234&quot;}</code>를 보내면 상태 코드 200과 함께 다음 응답이 옵니다. 샘플 회원이 두 명 들어 있으므로 새 회원의 <code>id</code>는 3입니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 200,
+  &quot;msg&quot;: &quot;성공&quot;,
+  &quot;body&quot;: {
+    &quot;id&quot;: 3,
+    &quot;username&quot;: &quot;love&quot;,
+    &quot;email&quot;: &quot;love@nate.com&quot;
+  }
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"성공"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+    <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"love"</span><span class="token punctuation">,</span>
+    <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"love@nate.com"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>비밀번호를 <code>&quot;5678&quot;</code>로 바꿔 보내면 상태 코드 401과 함께 다음 응답이 옵니다. 유저네임을 <code>&quot;nobody&quot;</code>처럼 없는 값으로 바꿔도 같은 응답이 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 401,
+  &quot;msg&quot;: &quot;유저네임 혹은 비밀번호가 일치하지 않습니다&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">401</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"유저네임 혹은 비밀번호가 일치하지 않습니다"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>findByUsername()</code>이 회원을 찾지 못하면 <code>orElseThrow()</code>가 <code>UnauthorizedException</code>을 던집니다. 비밀번호가 다르면 <code>if</code> 문이 같은 예외를 던집니다. 두 경우 모두 예외는 <code>ex401()</code>에 잡혀 401 응답이 됩니다. <code>로그인()</code>은 조회만 하는 메서드라서 <code>@Transactional</code>을 따로 붙이지 않았습니다. 그래서 클래스에 붙은 <code>readOnly = true</code>가 그대로 적용됩니다.</p>
+<p>두 실패에 같은 메시지를 쓴 데에는 이유가 있습니다. 메시지를 &quot;없는 유저네임입니다&quot;와 &quot;비밀번호가 틀렸습니다&quot;로 나누면 사용자에게는 친절합니다. 하지만 공격자도 그 메시지를 보고 어떤 유저네임이 가입되어 있는지 알아낼 수 있습니다. 가입된 유저네임을 알면 그 계정의 비밀번호만 집중해서 대입해 볼 수 있습니다. 11장의 유저네임 중복 확인 API는 가입 화면에 필요해서 그 정보를 알려 줄 수밖에 없습니다. 그렇다고 로그인 응답까지 같은 정보를 흘릴 이유는 없습니다.</p>
+<h3>3. JwtUtil 빈 만들기</h3>
+<h4>3.1 java-jwt 라이브러리</h4>
+<p>JWT를 직접 만들려면 Base64URL 인코딩과 HMAC 계산을 모두 구현해야 합니다. 이 책에서는 Auth0가 만든 <code>com.auth0:java-jwt</code> 4.5.0 라이브러리에 이 일을 맡깁니다. 이 라이브러리는 빌더로 클레임을 하나씩 쌓고, 마지막에 서명 알고리즘을 넘겨 토큰 문자열을 만듭니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</div><pre><code class="language-java" data-code="Algorithm 알고리즘 = Algorithm.HMAC512(비밀키);
+
+String 토큰 = JWT.create()
+        .withSubject(토큰주인)
+        .withExpiresAt(만료시각)
+        .withClaim(클레임이름, 값)
+        .sign(알고리즘);"><span class="token class-name">Algorithm</span> 알고리즘 <span class="token operator">=</span> <span class="token class-name">Algorithm</span><span class="token punctuation">.</span><span class="token function">HMAC512</span><span class="token punctuation">(</span>비밀키<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token class-name">String</span> 토큰 <span class="token operator">=</span> <span class="token constant">JWT</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">withSubject</span><span class="token punctuation">(</span>토큰주인<span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">withExpiresAt</span><span class="token punctuation">(</span>만료시각<span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">withClaim</span><span class="token punctuation">(</span>클레임이름<span class="token punctuation">,</span> 값<span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">sign</span><span class="token punctuation">(</span>알고리즘<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div></div>
+<p><code>withSubject()</code>는 <code>sub</code> 클레임을, <code>withExpiresAt()</code>은 <code>exp</code> 클레임을 채웁니다. 이름이 정해지지 않은 클레임은 <code>withClaim()</code>으로 넣습니다. <code>sign()</code>은 헤더와 페이로드를 인코딩하고 서명까지 붙여서 <code>헤더.페이로드.서명</code> 문자열을 돌려줍니다.</p>
+<p>라이브러리는 <code>build.gradle</code>의 <code>dependencies</code>에 한 줄을 추가해서 받습니다. 토큰을 만드는 코드가 컴파일될 때도, 서버가 실행될 때도 필요하므로 <code>implementation</code>으로 넣습니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="groovy"><div class="code-label"><span class="code-label__name">GROOVY</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="implementation &#x27;com.auth0:java-jwt:4.5.0&#x27;">implementation &#x27;com.auth0:java-jwt:4.5.0&#x27;</code></pre></div></div>
+<h4>3.2 @Component로 등록하고 비밀키 · 만료 시간을 설정값으로 받기</h4>
+<p>토큰을 만드는 코드는 로그인에서 씁니다. 14장에서 만들 토큰 검증 코드도 같은 서명 키를 써야 합니다. 그래서 토큰을 다루는 코드를 <code>JwtUtil</code> 클래스 한곳에 모읍니다.</p>
+<p><code>JwtUtil</code>은 2장에서 배운 <code>@Component</code>로 빈으로 등록합니다. 서명 키와 만료 시간은 코드에 적지 않고 2장처럼 <code>application.properties</code>에 설정 키를 만들어 <code>@Value</code>로 받습니다. 서명 키를 코드에 직접 적으면 키를 바꿀 때마다 코드를 고쳐야 하고, 키가 소스 코드와 함께 저장소에 남습니다. 설정값으로 받아 두면 22장에서 이 값을 환경 변수로 바꿀 때 <code>JwtUtil</code> 코드는 그대로 두고 설정 파일만 고치면 됩니다.</p>
+<p>설정 키 이름은 <code>app.jwt.secret</code>과 <code>app.jwt.expiration-time</code>으로 짓습니다. <code>app.</code>으로 시작하는 이름은 스프링이 정한 설정이 아니라 이 프로젝트가 만든 설정이라는 표시입니다.</p>
+<p><strong>예제 12-2 — 설정값을 받는 JwtUtil 빈 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 12-1</p>
+<p><strong>파일명:</strong> <code>build.gradle</code></p>
+<div class="code-wrap" data-kind="code" data-lang="groovy"><div class="code-label"><span class="code-label__name">GROOVY</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</div><pre><code data-code="plugins {
+    id &#x27;java&#x27;
+    id &#x27;org.springframework.boot&#x27; version &#x27;4.1.3&#x27;
+    id &#x27;io.spring.dependency-management&#x27; version &#x27;1.1.7&#x27;
+}
+
+group = &#x27;com.newtenco&#x27;
+version = &#x27;0.0.1-SNAPSHOT&#x27;
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation &#x27;com.auth0:java-jwt:4.5.0&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-h2console&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-data-jpa&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-security&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-validation&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-webmvc&#x27;
+    compileOnly &#x27;org.projectlombok:lombok&#x27;
+    developmentOnly &#x27;org.springframework.boot:spring-boot-devtools&#x27;
+    runtimeOnly &#x27;com.h2database:h2&#x27;
+    annotationProcessor &#x27;org.projectlombok:lombok&#x27;
+}">plugins {
+    id &#x27;java&#x27;
+    id &#x27;org.springframework.boot&#x27; version &#x27;4.1.3&#x27;
+    id &#x27;io.spring.dependency-management&#x27; version &#x27;1.1.7&#x27;
+}
+
+group = &#x27;com.newtenco&#x27;
+version = &#x27;0.0.1-SNAPSHOT&#x27;
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation &#x27;com.auth0:java-jwt:4.5.0&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-h2console&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-data-jpa&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-security&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-validation&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-webmvc&#x27;
+    compileOnly &#x27;org.projectlombok:lombok&#x27;
+    developmentOnly &#x27;org.springframework.boot:spring-boot-devtools&#x27;
+    runtimeOnly &#x27;com.h2database:h2&#x27;
+    annotationProcessor &#x27;org.projectlombok:lombok&#x27;
+}</code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/resources/application.properties</code></p>
+<div class="code-wrap" data-kind="code" data-lang="properties"><div class="code-label"><span class="code-label__name">PROPERTIES</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</div><pre><code data-code="server.port=8080
+spring.servlet.encoding.charset=UTF-8
+spring.servlet.encoding.force=true
+
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:test
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.open-in-view=false
+
+spring.sql.init.data-locations=classpath:db/data.sql
+spring.jpa.defer-datasource-initialization=true
+
+app.jwt.secret=newtenco-blog-jwt-secret-key-must-be-at-least-64-bytes-long-0123456789
+app.jwt.expiration-time=86400000">server.port=8080
+spring.servlet.encoding.charset=UTF-8
+spring.servlet.encoding.force=true
+
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:test
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.open-in-view=false
+
+spring.sql.init.data-locations=classpath:db/data.sql
+spring.jpa.defer-datasource-initialization=true
+
+app.jwt.secret=newtenco-blog-jwt-secret-key-must-be-at-least-64-bytes-long-0123456789
+app.jwt.expiration-time=86400000</code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/util/JwtUtil.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.util;
+
+import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+// JWT를 만드는 일(12장)과 검사하는 일(14장)을 한곳에 모을 클래스
+// 두 일은 반드시 같은 비밀 키를 써야 하므로 한 클래스에 둔다
+// @Component: 스프링이 객체를 하나만 만들어 빈으로 등록한다. 필요한 곳은 생성자로 주입받는다
+@Component
+public class JwtUtil {
+
+    // 토큰을 담는 HTTP 헤더 이름. 요청 · 응답 모두 이 이름을 쓴다
+    public static final String HEADER = &quot;Authorization&quot;;
+    // 토큰 앞에 붙이는 말. &quot;Bearer&quot; 뒤의 공백 한 칸까지가 접두사다
+    // 두 값은 HTTP 규칙으로 정해진 이름이라 환경마다 바뀌지 않으므로 설정 파일이 아닌 상수로 둔다
+    public static final String TOKEN_PREFIX = &quot;Bearer &quot;;
+
+    // 서명 도구(HS512 알고리즘 + 비밀 키). 생성자에서 한 번 만들어 두고 계속 쓴다
+    private final Algorithm algorithm;
+    // 토큰 유효 시간(밀리초). 86400000이면 24시간
+    private final long expirationTime;
+
+    // @Value: application.properties 같은 설정 파일의 값을 매개변수로 받는다
+    // 비밀 키를 코드에 직접 적지 않아야 키가 소스 코드와 함께 저장소에 남지 않는다
+    public JwtUtil(@Value(&quot;${app.jwt.secret}&quot;) String secret,
+                   @Value(&quot;${app.jwt.expiration-time}&quot;) long expirationTime) {
+        // HMAC512: 비밀 키 하나로 서명을 만들고, 검사할 때도 같은 키를 쓰는 방식
+        this.algorithm = Algorithm.HMAC512(secret);
+        this.expirationTime = expirationTime;
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>auth0<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span>algorithms<span class="token punctuation">.</span></span><span class="token class-name">Algorithm</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Value</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Component</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">// JWT를 만드는 일(12장)과 검사하는 일(14장)을 한곳에 모을 클래스</span>
+<span class="token comment">// 두 일은 반드시 같은 비밀 키를 써야 하므로 한 클래스에 둔다</span>
+<span class="token comment">// @Component: 스프링이 객체를 하나만 만들어 빈으로 등록한다. 필요한 곳은 생성자로 주입받는다</span>
+<span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JwtUtil</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// 토큰을 담는 HTTP 헤더 이름. 요청 · 응답 모두 이 이름을 쓴다</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">String</span> <span class="token constant">HEADER</span> <span class="token operator">=</span> <span class="token string">"Authorization"</span><span class="token punctuation">;</span>
+    <span class="token comment">// 토큰 앞에 붙이는 말. "Bearer" 뒤의 공백 한 칸까지가 접두사다</span>
+    <span class="token comment">// 두 값은 HTTP 규칙으로 정해진 이름이라 환경마다 바뀌지 않으므로 설정 파일이 아닌 상수로 둔다</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">String</span> <span class="token constant">TOKEN_PREFIX</span> <span class="token operator">=</span> <span class="token string">"Bearer "</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 서명 도구(HS512 알고리즘 + 비밀 키). 생성자에서 한 번 만들어 두고 계속 쓴다</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">Algorithm</span> algorithm<span class="token punctuation">;</span>
+    <span class="token comment">// 토큰 유효 시간(밀리초). 86400000이면 24시간</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">long</span> expirationTime<span class="token punctuation">;</span>
+
+    <span class="token comment">// @Value: application.properties 같은 설정 파일의 값을 매개변수로 받는다</span>
+    <span class="token comment">// 비밀 키를 코드에 직접 적지 않아야 키가 소스 코드와 함께 저장소에 남지 않는다</span>
+    <span class="token keyword">public</span> <span class="token class-name">JwtUtil</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${app.jwt.secret}"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> secret<span class="token punctuation">,</span>
+                   <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${app.jwt.expiration-time}"</span><span class="token punctuation">)</span> <span class="token keyword">long</span> expirationTime<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// HMAC512: 비밀 키 하나로 서명을 만들고, 검사할 때도 같은 키를 쓰는 방식</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>algorithm <span class="token operator">=</span> <span class="token class-name">Algorithm</span><span class="token punctuation">.</span><span class="token function">HMAC512</span><span class="token punctuation">(</span>secret<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>expirationTime <span class="token operator">=</span> expirationTime<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>IntelliJ에서 Load Gradle Changes를 눌러 java-jwt를 내려받습니다. 그다음 Terminal에서 <code>gradlew.bat bootRun</code>으로 서버를 띄웁니다. 서버는 오류 없이 시작됩니다. 아직 <code>JwtUtil</code>을 쓰는 곳이 없으므로 로그인 응답은 예제 12-1과 같습니다.</p>
+<p>스프링은 <code>JwtUtil</code> 빈을 만들 때 생성자를 호출합니다. 이때 <code>@Value</code>가 붙은 두 매개변수에 설정 파일의 값을 넣어 줍니다. <code>app.jwt.expiration-time</code>에 적은 문자열 <code>86400000</code>은 매개변수 타입에 맞게 <code>long</code>으로 바뀝니다. 이 값은 밀리초 단위로 24시간(1000 × 60 × 60 × 24)입니다.</p>
+<p>생성자는 받은 비밀키로 곧바로 <code>Algorithm</code> 객체를 만들어 필드에 둡니다. 그러면 키 문자열을 필드에 두었다가 토큰을 만들 때마다 알고리즘을 다시 만들지 않아도 됩니다. 이렇게 생성자 안에서 값을 가공해야 하므로 <code>@RequiredArgsConstructor</code> 대신 생성자를 직접 썼습니다. <code>@RequiredArgsConstructor</code>가 만드는 생성자는 받은 값을 필드에 그대로 넣기만 합니다.</p>
+<p><code>JwtUtil</code> 빈은 하나만 만들어지는 싱글톤이고, 두 필드는 생성자에서 한 번 정해진 뒤 바뀌지 않는 <code>final</code>입니다. 그래서 여러 요청이 동시에 이 빈을 써도 서로 영향을 주지 않습니다.</p>
+<p>서명 키 문자열을 일부러 길게 쓴 데에도 이유가 있습니다. HS512는 SHA-512를 쓰므로 서명 키도 512비트, 즉 64바이트 이상이어야 합니다. JWT 알고리즘 표준(RFC 7518)이 해시 출력 길이 이상의 키를 쓰도록 정하고 있습니다. 키가 짧으면 공격자가 키를 추측하기 쉬워집니다. 예제의 키는 70바이트입니다.</p>
+<h4>3.3 HEADER와 TOKEN_PREFIX는 상수로 두는 이유</h4>
+<p>예제 12-2에서 비밀키와 만료 시간은 설정값으로 받았지만, <code>HEADER</code>와 <code>TOKEN_PREFIX</code>는 <code>public static final</code> 상수로 남겼습니다. 두 값의 성격이 다르기 때문입니다.</p>
+<table><thead><tr><th>값</th><th>성격</th><th>두는 곳</th></tr></thead><tbody><tr><td>서명 키 · 만료 시간</td><td>실행 환경마다 달라질 수 있다. 서명 키는 비밀이다</td><td>설정 파일(<code>@Value</code>로 받는 필드)</td></tr><tr><td><code>HEADER</code> · <code>TOKEN_PREFIX</code></td><td>HTTP 규칙으로 정해진 이름이라 어디서 실행해도 같다</td><td>코드(<code>static final</code> 상수)</td></tr></tbody></table>
+<p><code>&quot;Authorization&quot;</code>과 <code>&quot;Bearer &quot;</code>는 1.3에서 본 HTTP 규칙이므로 개발 환경과 운영 환경에서 다를 일이 없습니다. 설정 파일로 뺄 이유가 없습니다.</p>
+<p>상수로 두면 쓰는 쪽도 편합니다. <code>static</code> 상수는 빈을 주입받지 않아도 <code>JwtUtil.HEADER</code>처럼 클래스 이름으로 바로 꺼낼 수 있습니다. 4.2의 Controller는 토큰을 만들지 않고 헤더 이름만 쓰므로 <code>JwtUtil</code> 빈을 주입받을 필요가 없습니다.</p>
+<p>더 중요한 이유는 애너테이션에 있습니다. 자바 애너테이션의 속성값에는 컴파일할 때 값이 정해지는 상수만 넣을 수 있습니다. <code>@Value</code>로 받는 필드는 서버가 실행되어야 값이 정해지므로 애너테이션에 넣을 수 없습니다. 24장에서 API 문서를 만들 때 springdoc 애너테이션에 토큰 헤더 이름을 적어야 합니다. 이때 문자열을 직접 쓰지 않고 다음처럼 상수를 가리킵니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code class="language-java" data-code="@Header(name = JwtUtil.HEADER, description = &quot;로그인 토큰&quot;)"><span class="token annotation punctuation">@Header</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token class-name">JwtUtil</span><span class="token punctuation">.</span><span class="token constant">HEADER</span><span class="token punctuation">,</span> description <span class="token operator">=</span> <span class="token string">"로그인 토큰"</span><span class="token punctuation">)</span></code></pre></div></div>
+<h4>3.4 토큰 발급(클레임 · 만료 시간 · 서명)</h4>
+<p>이제 <code>JwtUtil</code>에 토큰을 만드는 <code>create()</code> 메서드를 추가합니다. 회원 정보를 받아 클레임을 채우고, 만료 시각을 정하고, 생성자에서 만든 알고리즘으로 서명합니다.</p>
+<p><strong>예제 12-3 — 토큰 발급 메서드 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 12-2</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/util/JwtUtil.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.util;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.newtenco.blog.user.User;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+// JWT를 만드는 일(12장)과 검사하는 일(14장)을 한곳에 모을 클래스
+// 두 일은 반드시 같은 비밀 키를 써야 하므로 한 클래스에 둔다
+// @Component: 스프링이 객체를 하나만 만들어 빈으로 등록한다. 필요한 곳은 생성자로 주입받는다
+@Component
+public class JwtUtil {
+
+    // 토큰을 담는 HTTP 헤더 이름. 요청 · 응답 모두 이 이름을 쓴다
+    public static final String HEADER = &quot;Authorization&quot;;
+    // 토큰 앞에 붙이는 말. &quot;Bearer&quot; 뒤의 공백 한 칸까지가 접두사다
+    // 두 값은 HTTP 규칙으로 정해진 이름이라 환경마다 바뀌지 않으므로 설정 파일이 아닌 상수로 둔다
+    public static final String TOKEN_PREFIX = &quot;Bearer &quot;;
+
+    // 서명 도구(HS512 알고리즘 + 비밀 키). 생성자에서 한 번 만들어 두고 계속 쓴다
+    private final Algorithm algorithm;
+    // 토큰 유효 시간(밀리초). 86400000이면 24시간
+    private final long expirationTime;
+
+    // @Value: application.properties 같은 설정 파일의 값을 매개변수로 받는다
+    // 비밀 키를 코드에 직접 적지 않아야 키가 소스 코드와 함께 저장소에 남지 않는다
+    public JwtUtil(@Value(&quot;${app.jwt.secret}&quot;) String secret,
+                   @Value(&quot;${app.jwt.expiration-time}&quot;) long expirationTime) {
+        // HMAC512: 비밀 키 하나로 서명을 만들고, 검사할 때도 같은 키를 쓰는 방식
+        this.algorithm = Algorithm.HMAC512(secret);
+        this.expirationTime = expirationTime;
+    }
+
+    // 로그인에 성공한 회원의 토큰을 만든다
+    // 토큰 내용(페이로드)은 누구나 디코딩해 읽을 수 있으므로 비밀번호 · 이메일은 넣지 않는다
+    public String create(User user) {
+        String jwt = JWT.create()
+                // sub(subject) 칸: 토큰의 주인. 유저네임을 넣는다
+                .withSubject(user.getUsername())
+                // exp 칸: 만료 시각. 지금 시각에 유효 시간을 더한 때다
+                .withExpiresAt(new Date(System.currentTimeMillis() + expirationTime))
+                // 직접 이름을 정한 칸. 14장의 인증 필터가 요청을 보낸 회원을 알아낼 때 쓴다
+                .withClaim(&quot;id&quot;, user.getId())
+                .withClaim(&quot;username&quot;, user.getUsername())
+                // 헤더와 페이로드를 비밀 키로 서명해 &quot;헤더.페이로드.서명&quot; 문자열을 만든다
+                .sign(algorithm);
+        // 앞에 &quot;Bearer &quot;를 붙여 돌려준다. 클라이언트는 이 값을 그대로 Authorization 헤더에 넣으면 된다
+        return TOKEN_PREFIX + jwt;
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>auth0<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span></span><span class="token class-name">JWT</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>auth0<span class="token punctuation">.</span>jwt<span class="token punctuation">.</span>algorithms<span class="token punctuation">.</span></span><span class="token class-name">Algorithm</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user<span class="token punctuation">.</span></span><span class="token class-name">User</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>beans<span class="token punctuation">.</span>factory<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Value</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Component</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Date</span></span><span class="token punctuation">;</span>
+
+<span class="token comment">// JWT를 만드는 일(12장)과 검사하는 일(14장)을 한곳에 모을 클래스</span>
+<span class="token comment">// 두 일은 반드시 같은 비밀 키를 써야 하므로 한 클래스에 둔다</span>
+<span class="token comment">// @Component: 스프링이 객체를 하나만 만들어 빈으로 등록한다. 필요한 곳은 생성자로 주입받는다</span>
+<span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JwtUtil</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// 토큰을 담는 HTTP 헤더 이름. 요청 · 응답 모두 이 이름을 쓴다</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">String</span> <span class="token constant">HEADER</span> <span class="token operator">=</span> <span class="token string">"Authorization"</span><span class="token punctuation">;</span>
+    <span class="token comment">// 토큰 앞에 붙이는 말. "Bearer" 뒤의 공백 한 칸까지가 접두사다</span>
+    <span class="token comment">// 두 값은 HTTP 규칙으로 정해진 이름이라 환경마다 바뀌지 않으므로 설정 파일이 아닌 상수로 둔다</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">String</span> <span class="token constant">TOKEN_PREFIX</span> <span class="token operator">=</span> <span class="token string">"Bearer "</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 서명 도구(HS512 알고리즘 + 비밀 키). 생성자에서 한 번 만들어 두고 계속 쓴다</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">Algorithm</span> algorithm<span class="token punctuation">;</span>
+    <span class="token comment">// 토큰 유효 시간(밀리초). 86400000이면 24시간</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">long</span> expirationTime<span class="token punctuation">;</span>
+
+    <span class="token comment">// @Value: application.properties 같은 설정 파일의 값을 매개변수로 받는다</span>
+    <span class="token comment">// 비밀 키를 코드에 직접 적지 않아야 키가 소스 코드와 함께 저장소에 남지 않는다</span>
+    <span class="token keyword">public</span> <span class="token class-name">JwtUtil</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${app.jwt.secret}"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> secret<span class="token punctuation">,</span>
+                   <span class="token annotation punctuation">@Value</span><span class="token punctuation">(</span><span class="token string">"${app.jwt.expiration-time}"</span><span class="token punctuation">)</span> <span class="token keyword">long</span> expirationTime<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// HMAC512: 비밀 키 하나로 서명을 만들고, 검사할 때도 같은 키를 쓰는 방식</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>algorithm <span class="token operator">=</span> <span class="token class-name">Algorithm</span><span class="token punctuation">.</span><span class="token function">HMAC512</span><span class="token punctuation">(</span>secret<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>expirationTime <span class="token operator">=</span> expirationTime<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// 로그인에 성공한 회원의 토큰을 만든다</span>
+    <span class="token comment">// 토큰 내용(페이로드)은 누구나 디코딩해 읽을 수 있으므로 비밀번호 · 이메일은 넣지 않는다</span>
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">create</span><span class="token punctuation">(</span><span class="token class-name">User</span> user<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">String</span> jwt <span class="token operator">=</span> <span class="token constant">JWT</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token comment">// sub(subject) 칸: 토큰의 주인. 유저네임을 넣는다</span>
+                <span class="token punctuation">.</span><span class="token function">withSubject</span><span class="token punctuation">(</span>user<span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token comment">// exp 칸: 만료 시각. 지금 시각에 유효 시간을 더한 때다</span>
+                <span class="token punctuation">.</span><span class="token function">withExpiresAt</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> expirationTime<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token comment">// 직접 이름을 정한 칸. 14장의 인증 필터가 요청을 보낸 회원을 알아낼 때 쓴다</span>
+                <span class="token punctuation">.</span><span class="token function">withClaim</span><span class="token punctuation">(</span><span class="token string">"id"</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">withClaim</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token comment">// 헤더와 페이로드를 비밀 키로 서명해 "헤더.페이로드.서명" 문자열을 만든다</span>
+                <span class="token punctuation">.</span><span class="token function">sign</span><span class="token punctuation">(</span>algorithm<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 앞에 "Bearer "를 붙여 돌려준다. 클라이언트는 이 값을 그대로 Authorization 헤더에 넣으면 된다</span>
+        <span class="token keyword">return</span> <span class="token constant">TOKEN_PREFIX</span> <span class="token operator">+</span> jwt<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>서버는 오류 없이 시작됩니다. <code>create()</code>를 호출하는 곳이 아직 없으므로 로그인 응답은 예제 12-1과 같습니다. 토큰은 4절에서 로그인에 연결한 뒤 확인합니다.</p>
+<p><code>create()</code>는 토큰을 세 단계로 만듭니다.</p>
+<ol>
+<li>클레임을 채웁니다. <code>sub</code>에는 유저네임을 넣고, 애플리케이션 클레임으로 회원 번호 <code>id</code>와 <code>username</code>을 넣습니다. 14장의 인증 필터는 이 값들로 요청을 보낸 회원이 누구인지 알아냅니다. 1.2에서 본 것처럼 페이로드는 누구나 읽을 수 있으므로 비밀번호와 이메일은 넣지 않습니다.</li>
+<li>만료 시각을 정합니다. <code>System.currentTimeMillis()</code>로 얻은 지금 시각(밀리초)에 <code>expirationTime</code>을 더하면 24시간 뒤의 시각이 나옵니다. java-jwt는 이 값을 <code>exp</code> 클레임에 초 단위로 적습니다.</li>
+<li><code>sign(algorithm)</code>이 헤더와 페이로드를 인코딩하고 서명을 붙입니다. 헤더의 <code>alg</code>에는 <code>algorithm</code>에 맞는 <code>HS512</code>가 자동으로 들어갑니다.</li>
+</ol>
+<p>마지막 줄에서 토큰 앞에 <code>TOKEN_PREFIX</code>를 붙여 <code>Bearer 헤더.페이로드.서명</code> 형태로 돌려줍니다. 클라이언트가 받은 값을 그대로 <code>Authorization</code> 헤더에 넣을 수 있게 하기 위해서입니다.</p>
+<p>토큰을 발급한 시각을 뜻하는 <code>iat</code> 클레임은 이 예제에서 java-jwt가 자동으로 넣지 않습니다. 필요하면 <code>withIssuedAt()</code>으로 넣습니다. 이 책의 인증 필터는 발급 시각을 쓰지 않으므로 생략했습니다.</p>
+<p><code>create()</code>가 <code>static</code>이 아니라는 점도 짚어 둡니다. 이 메서드는 생성자에서 설정값으로 채운 <code>algorithm</code>과 <code>expirationTime</code> 필드를 씁니다. 그래서 <code>JwtUtil.create(user)</code>처럼 클래스 이름으로는 호출할 수 없습니다. 빈을 주입받은 뒤 <code>jwtUtil.create(user)</code>로 호출합니다.</p>
+<h3>4. 토큰 돌려주기</h3>
+<h4>4.1 JwtUtil을 주입받는 UserService</h4>
+<p>로그인에 성공하면 <code>UserService</code>가 토큰을 만듭니다. <code>UserService</code>는 이미 <code>UserRepository</code>와 <code>PasswordEncoder</code>를 생성자로 주입받고 있습니다. 여기에 <code>final</code> 필드로 <code>JwtUtil</code>을 하나 더하면 <code>@RequiredArgsConstructor</code>가 만드는 생성자에 매개변수가 추가되고, 스프링이 <code>JwtUtil</code> 빈을 넣어 줍니다.</p>
+<p>Service는 토큰과 회원 정보 두 가지를 Controller에 넘겨야 합니다. 메서드는 값을 하나만 돌려줄 수 있으므로 둘을 묶는 record <code>UserResponse.LoginDTO</code>를 만듭니다. 이 DTO는 클라이언트에게 그대로 보내는 응답이 아닙니다. Service와 Controller 사이에서 값을 옮기는 용도입니다.</p>
+<p><strong>예제 12-4 — 로그인할 때 토큰 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 12-3</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserResponse.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+public class UserResponse {
+
+    public record DTO(Integer id, String username, String email) {
+
+        public DTO(User user) {
+            this(user.getId(), user.getUsername(), user.getEmail());
+        }
+    }
+
+    public record LoginDTO(String accessToken, DTO user) {
+    }
+
+    public record AvailableDTO(boolean available) {
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserResponse</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">DTO</span><span class="token punctuation">(</span><span class="token class-name">Integer</span> id<span class="token punctuation">,</span> <span class="token class-name">String</span> username<span class="token punctuation">,</span> <span class="token class-name">String</span> email<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token function">DTO</span><span class="token punctuation">(</span><span class="token class-name">User</span> user<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">(</span>user<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getEmail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">LoginDTO</span><span class="token punctuation">(</span><span class="token class-name">String</span> accessToken<span class="token punctuation">,</span> <span class="token class-name">DTO</span> user<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">AvailableDTO</span><span class="token punctuation">(</span><span class="token keyword">boolean</span> available<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserService.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import com.newtenco.blog.core.handler.errors.UnauthorizedException;
+import com.newtenco.blog.core.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    @Transactional
+    public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
+        if (userRepository.existsByUsername(reqDTO.username())) {
+            throw new BadRequestException(&quot;이미 존재하는 유저네임입니다&quot;);
+        }
+        // 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다
+        // 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다
+        String encPassword = passwordEncoder.encode(reqDTO.password());
+        User savedUser = userRepository.save(reqDTO.toEntity(encPassword));
+        return new UserResponse.DTO(savedUser);
+    }
+
+    public UserResponse.LoginDTO 로그인(UserRequest.LoginDTO reqDTO) {
+        // 1단계: 유저네임으로 회원을 찾는다. 없으면 401
+        User user = userRepository.findByUsername(reqDTO.username())
+                .orElseThrow(() -&gt; new UnauthorizedException(&quot;유저네임 혹은 비밀번호가 일치하지 않습니다&quot;));
+
+        // 2단계: matches(입력한 평문, 저장된 해시). 해시 안의 솔트로 평문을 다시 해시해 비교한다
+        // 두 실패에 같은 메시지를 쓴다. 나누면 어떤 유저네임이 가입돼 있는지 공격자에게 알려 주게 된다
+        if (!passwordEncoder.matches(reqDTO.password(), user.getPassword())) {
+            throw new UnauthorizedException(&quot;유저네임 혹은 비밀번호가 일치하지 않습니다&quot;);
+        }
+        // 인증에 성공한 회원의 JWT를 만든다
+        String accessToken = jwtUtil.create(user);
+        return new UserResponse.LoginDTO(accessToken, new UserResponse.DTO(user));
+    }
+
+    public UserResponse.AvailableDTO 유저네임중복체크(String username) {
+        boolean available = !userRepository.existsByUsername(username);
+        return new UserResponse.AvailableDTO(available);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">UnauthorizedException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">JwtUtil</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>crypto<span class="token punctuation">.</span>password<span class="token punctuation">.</span></span><span class="token class-name">PasswordEncoder</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>transaction<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Transactional</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@Transactional</span><span class="token punctuation">(</span>readOnly <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserService</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserRepository</span> userRepository<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">PasswordEncoder</span> passwordEncoder<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">JwtUtil</span> jwtUtil<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Transactional</span>
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token constant">DTO</span> 회원가입<span class="token punctuation">(</span><span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">BadRequestException</span><span class="token punctuation">(</span><span class="token string">"이미 존재하는 유저네임입니다"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다</span>
+        <span class="token comment">// 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다</span>
+        <span class="token class-name">String</span> encPassword <span class="token operator">=</span> passwordEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">User</span> savedUser <span class="token operator">=</span> userRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">toEntity</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token function">DTO</span><span class="token punctuation">(</span>savedUser<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>LoginDTO</span> 로그인<span class="token punctuation">(</span><span class="token class-name">UserRequest<span class="token punctuation">.</span>LoginDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// 1단계: 유저네임으로 회원을 찾는다. 없으면 401</span>
+        <span class="token class-name">User</span> user <span class="token operator">=</span> userRepository<span class="token punctuation">.</span><span class="token function">findByUsername</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">orElseThrow</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token keyword">new</span> <span class="token class-name">UnauthorizedException</span><span class="token punctuation">(</span><span class="token string">"유저네임 혹은 비밀번호가 일치하지 않습니다"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 2단계: matches(입력한 평문, 저장된 해시). 해시 안의 솔트로 평문을 다시 해시해 비교한다</span>
+        <span class="token comment">// 두 실패에 같은 메시지를 쓴다. 나누면 어떤 유저네임이 가입돼 있는지 공격자에게 알려 주게 된다</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>passwordEncoder<span class="token punctuation">.</span><span class="token function">matches</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getPassword</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">UnauthorizedException</span><span class="token punctuation">(</span><span class="token string">"유저네임 혹은 비밀번호가 일치하지 않습니다"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 인증에 성공한 회원의 JWT를 만든다</span>
+        <span class="token class-name">String</span> accessToken <span class="token operator">=</span> jwtUtil<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>LoginDTO</span><span class="token punctuation">(</span>accessToken<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token function">DTO</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>AvailableDTO</span> 유저네임중복체크<span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">boolean</span> available <span class="token operator">=</span> <span class="token operator">!</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>AvailableDTO</span><span class="token punctuation">(</span>available<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>예제 12-1처럼 <code>love</code>로 가입한 뒤 로그인 요청을 보냅니다. Controller는 아직 <code>Resp.ok(userService.로그인(reqDTO))</code>로 Service의 반환값을 그대로 본문에 넣습니다. 그래서 본문에 토큰과 회원 정보가 함께 나옵니다. 토큰 문자열은 실제로는 수백 글자이고, 만료 시각이 달라지므로 로그인할 때마다 바뀝니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 200,
+  &quot;msg&quot;: &quot;성공&quot;,
+  &quot;body&quot;: {
+    &quot;accessToken&quot;: &quot;Bearer 헤더.페이로드.서명&quot;,
+    &quot;user&quot;: {
+      &quot;id&quot;: 3,
+      &quot;username&quot;: &quot;love&quot;,
+      &quot;email&quot;: &quot;love@nate.com&quot;
+    }
+  }
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"성공"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"accessToken"</span><span class="token operator">:</span> <span class="token string">"Bearer 헤더.페이로드.서명"</span><span class="token punctuation">,</span>
+    <span class="token property">"user"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+      <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"love"</span><span class="token punctuation">,</span>
+      <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"love@nate.com"</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>UserService</code>에서 바뀐 곳은 <code>private final JwtUtil jwtUtil;</code> 필드 한 줄과 <code>jwtUtil.create(user)</code> 호출입니다. 생성자 코드는 <code>@RequiredArgsConstructor</code>가 다시 만들어 주므로 직접 고칠 곳이 없습니다.</p>
+<p><code>JwtUtil</code>을 <code>static</code> 메서드로 두지 않고 빈으로 주입받으면 테스트할 때도 이점이 있습니다. 25장의 단위 테스트에서는 테스트용 키를 넣어 <code>new JwtUtil(...)</code>로 직접 만들 수 있습니다. 정해진 키로 만든 토큰을 확인할 수 있고, 생성자로 주입받으므로 <code>UserService</code>에 목 객체를 바꿔 끼우기도 쉽습니다.</p>
+<h4>4.2 응답 헤더에 토큰 담기</h4>
+<p>예제 12-4는 토큰이 본문에 들어 있어 1.3에서 정한 약속과 다릅니다. 토큰은 응답 헤더 <code>Authorization</code>에 담고, 본문에는 다른 API처럼 회원 정보만 두도록 Controller를 고칩니다.</p>
+<p><strong>예제 12-5 — 로그인 응답 헤더에 토큰 담기</strong></p>
+<p><strong>이어서:</strong> 예제 12-4</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.util.JwtUtil;
+import com.newtenco.blog.core.util.Resp;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    @PostMapping(&quot;/join&quot;)
+    public ResponseEntity&lt;?&gt; join(@Valid @RequestBody UserRequest.JoinDTO reqDTO) {
+        return Resp.ok(userService.회원가입(reqDTO));
+    }
+
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;?&gt; login(@RequestBody UserRequest.LoginDTO reqDTO) {
+        UserResponse.LoginDTO loginDTO = userService.로그인(reqDTO);
+        // 토큰은 응답 헤더 Authorization에, 회원 정보는 본문에 담는다
+        // Resp.ok()로는 헤더를 더할 수 없어서 ResponseEntity 빌더로 직접 만든다
+        return ResponseEntity.ok()
+                .header(JwtUtil.HEADER, loginDTO.accessToken())
+                .body(new Resp&lt;&gt;(200, &quot;성공&quot;, loginDTO.user()));
+    }
+
+    @GetMapping(&quot;/check-username&quot;)
+    public ResponseEntity&lt;?&gt; checkUsername(@RequestParam(&quot;username&quot;) String username) {
+        return Resp.ok(userService.유저네임중복체크(username));
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">JwtUtil</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">Valid</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">GetMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">PostMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestBody</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestParam</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserService</span> userService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/join"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">join</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>회원가입<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">login</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>LoginDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">UserResponse<span class="token punctuation">.</span>LoginDTO</span> loginDTO <span class="token operator">=</span> userService<span class="token punctuation">.</span>로그인<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 토큰은 응답 헤더 Authorization에, 회원 정보는 본문에 담는다</span>
+        <span class="token comment">// Resp.ok()로는 헤더를 더할 수 없어서 ResponseEntity 빌더로 직접 만든다</span>
+        <span class="token keyword">return</span> <span class="token class-name">ResponseEntity</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token class-name">JwtUtil</span><span class="token punctuation">.</span><span class="token constant">HEADER</span><span class="token punctuation">,</span> loginDTO<span class="token punctuation">.</span><span class="token function">accessToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">body</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Resp</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token string">"성공"</span><span class="token punctuation">,</span> loginDTO<span class="token punctuation">.</span><span class="token function">user</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/check-username"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">checkUsername</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestParam</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>유저네임중복체크<span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p><code>love</code>로 가입한 뒤 로그인 요청을 보내면 응답 본문은 예제 12-1과 같습니다. Postman 응답 영역의 Headers 탭에는 다음 헤더가 추가됩니다.</p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="Authorization: Bearer 헤더.페이로드.서명">Authorization: Bearer 헤더.페이로드.서명</code></pre></div></div>
+<figure class="book-figure" data-type="generated" id="figure-2ce5a4a570d4"><div class="figure-scroll"><img src="../assets/img/76e3f000f35fead9.png" alt="Postman에서 POST http://localhost:8080/login을 보낸 뒤 응답 영역의 Headers 탭" data-raster="true"/></div><figcaption>Postman에서 POST http://localhost:8080/login을 보낸 뒤 응답 영역의 Headers 탭</figcaption><p class="credit">생성형 예시 · 실제 실행 안 함</p></figure>
+<p>받은 토큰에서 <code>Bearer </code>를 뺀 부분의 페이로드를 디코딩하면 다음 클레임이 보입니다. <code>exp</code>는 1970년 1월 1일부터 센 초 단위 시각이므로 실행한 때에 따라 값이 다릅니다.</p>
+<table><thead><tr><th>클레임</th><th>값</th><th>넣은 코드</th></tr></thead><tbody><tr><td><code>sub</code></td><td><code>&quot;love&quot;</code></td><td><code>withSubject()</code></td></tr><tr><td><code>exp</code></td><td>로그인 시각 + 24시간</td><td><code>withExpiresAt()</code></td></tr><tr><td><code>id</code></td><td><code>3</code></td><td><code>withClaim(&quot;id&quot;, ...)</code></td></tr><tr><td><code>username</code></td><td><code>&quot;love&quot;</code></td><td><code>withClaim(&quot;username&quot;, ...)</code></td></tr></tbody></table>
+<p><code>login()</code>이 <code>Resp.ok()</code>를 쓰지 않은 이유는 헤더 때문입니다. <code>Resp.ok()</code>는 본문만 받아 <code>ResponseEntity</code>를 바로 만들어 돌려주므로 그 위에 헤더를 더할 수 없습니다. 그래서 <code>ResponseEntity.ok()</code> 빌더로 상태 코드를 정하고, <code>header()</code>로 토큰을 넣은 뒤, <code>body()</code>에 <code>Resp</code>를 직접 만들어 넣었습니다. 본문은 여전히 <code>Resp</code>이므로 다른 API와 응답 모양이 같습니다.</p>
+<p>대신 <code>200</code>과 <code>&quot;성공&quot;</code>을 Controller에 직접 적게 됩니다. 6장에서 본 것처럼 <code>ResponseEntity</code>의 HTTP 상태 코드와 본문의 <code>status</code>가 같아야 하는데, 이 둘을 개발자가 맞춰야 합니다. 헤더가 필요한 응답이 많아지면 <code>Resp</code>에 헤더까지 받는 정적 메서드를 하나 더 두는 방법도 있습니다. 이 책에서는 그런 응답이 많지 않아 빌더를 그대로 씁니다.</p>
+<p>헤더 이름은 3.3에서 정한 상수 <code>JwtUtil.HEADER</code>로 적었습니다. Controller는 토큰을 만들지 않으므로 <code>JwtUtil</code> 빈을 주입받지 않고 클래스 이름으로 상수만 꺼냅니다. 이렇게 담은 헤더를 Postman은 바로 보여 주지만, 브라우저의 JavaScript는 기본으로 읽지 못합니다. 이 문제는 13장에서 CORS를 설정하며 해결합니다.</p>
+<h3>5. 로그인 입력 검사</h3>
+<p>예제 12-5의 로그인 API에 <code>username</code> 키를 빼고 요청하면 <code>reqDTO.username()</code>이 <code>null</code>이 됩니다. <code>null</code>로는 회원을 찾을 수 없으므로 401 응답이 나갑니다. 하지만 이 요청은 입력이 빠진 것이지 인증에 실패한 것이 아닙니다. 빈 값은 Service까지 내려보내지 말고 11장처럼 Bean Validation으로 먼저 걸러 400으로 돌려줍니다.</p>
+<p>로그인 요청 DTO에는 길이 · 형식 검사를 넣지 않고 <code>@NotBlank</code>만 붙입니다. 길이 규칙은 가입할 때 이미 검사했습니다. 로그인에서 길이 규칙을 검사해 오류 메시지로 돌려주면 공격자에게 비밀번호 규칙을 알려 주는 셈입니다. 규칙에 맞지 않는 값은 어차피 일치하는 회원이 없어 401이 됩니다.</p>
+<p><strong>예제 12-6 — 로그인 빈 값 검사하기</strong></p>
+<p><strong>이어서:</strong> 예제 12-5</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserRequest.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class UserRequest {
+
+    public record JoinDTO(
+            @NotBlank(message = &quot;유저네임을 입력해주세요&quot;)
+            @Size(min = 4, max = 20, message = &quot;유저네임은 4~20자여야 합니다&quot;)
+            String username,
+
+            @NotBlank(message = &quot;비밀번호를 입력해주세요&quot;)
+            @Size(min = 4, max = 20, message = &quot;비밀번호는 4~20자여야 합니다&quot;)
+            String password,
+
+            @NotBlank(message = &quot;이메일을 입력해주세요&quot;)
+            @Email(message = &quot;이메일 형식이 올바르지 않습니다&quot;)
+            String email) {
+
+        public User toEntity(String encPassword) {
+            return User.builder()
+                    .username(username)
+                    .password(encPassword)
+                    .email(email)
+                    .build();
+        }
+    }
+
+    public record LoginDTO(
+            @NotBlank(message = &quot;유저네임을 입력해주세요&quot;)
+            String username,
+
+            @NotBlank(message = &quot;비밀번호를 입력해주세요&quot;)
+            String password) {
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">Email</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">NotBlank</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">Size</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserRequest</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">JoinDTO</span><span class="token punctuation">(</span>
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"유저네임을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">,</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"유저네임은 4~20자여야 합니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> username<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"비밀번호를 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">,</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"비밀번호는 4~20자여야 합니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> password<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"이메일을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Email</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"이메일 형식이 올바르지 않습니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> email<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token class-name">User</span> <span class="token function">toEntity</span><span class="token punctuation">(</span><span class="token class-name">String</span> encPassword<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token class-name">User</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">email</span><span class="token punctuation">(</span>email<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">LoginDTO</span><span class="token punctuation">(</span>
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"유저네임을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> username<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"비밀번호를 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> password<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.util.JwtUtil;
+import com.newtenco.blog.core.util.Resp;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    @PostMapping(&quot;/join&quot;)
+    public ResponseEntity&lt;?&gt; join(@Valid @RequestBody UserRequest.JoinDTO reqDTO) {
+        return Resp.ok(userService.회원가입(reqDTO));
+    }
+
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;?&gt; login(@Valid @RequestBody UserRequest.LoginDTO reqDTO) {
+        UserResponse.LoginDTO loginDTO = userService.로그인(reqDTO);
+        // 토큰은 응답 헤더 Authorization에, 회원 정보는 본문에 담는다
+        // Resp.ok()로는 헤더를 더할 수 없어서 ResponseEntity 빌더로 직접 만든다
+        return ResponseEntity.ok()
+                .header(JwtUtil.HEADER, loginDTO.accessToken())
+                .body(new Resp&lt;&gt;(200, &quot;성공&quot;, loginDTO.user()));
+    }
+
+    @GetMapping(&quot;/check-username&quot;)
+    public ResponseEntity&lt;?&gt; checkUsername(@RequestParam(&quot;username&quot;) String username) {
+        return Resp.ok(userService.유저네임중복체크(username));
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">JwtUtil</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">Valid</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">GetMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">PostMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestBody</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestParam</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserService</span> userService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/join"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">join</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>회원가입<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/login"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">login</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>LoginDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">UserResponse<span class="token punctuation">.</span>LoginDTO</span> loginDTO <span class="token operator">=</span> userService<span class="token punctuation">.</span>로그인<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 토큰은 응답 헤더 Authorization에, 회원 정보는 본문에 담는다</span>
+        <span class="token comment">// Resp.ok()로는 헤더를 더할 수 없어서 ResponseEntity 빌더로 직접 만든다</span>
+        <span class="token keyword">return</span> <span class="token class-name">ResponseEntity</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">header</span><span class="token punctuation">(</span><span class="token class-name">JwtUtil</span><span class="token punctuation">.</span><span class="token constant">HEADER</span><span class="token punctuation">,</span> loginDTO<span class="token punctuation">.</span><span class="token function">accessToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">body</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Resp</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token string">"성공"</span><span class="token punctuation">,</span> loginDTO<span class="token punctuation">.</span><span class="token function">user</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/check-username"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">checkUsername</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestParam</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>유저네임중복체크<span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p><code>POST http://localhost:8080/login</code>에 <code>{&quot;username&quot;:&quot;love&quot;,&quot;password&quot;:&quot;&quot;}</code>를 보내면 상태 코드 400과 함께 다음 응답이 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;비밀번호를 입력해주세요&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"비밀번호를 입력해주세요"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>{&quot;password&quot;:&quot;1234&quot;}</code>처럼 <code>username</code> 키를 빼고 보내면 <code>&quot;유저네임을 입력해주세요&quot;</code> 메시지와 함께 400 응답이 옵니다. 예제 12-5에서는 같은 요청이 401이었습니다.</p>
+<p>Controller에서 바뀐 것은 <code>login()</code>의 매개변수 앞에 붙은 <code>@Valid</code> 하나입니다. <code>@Valid</code>가 붙은 요청 DTO의 검증에 실패하면 <code>MethodArgumentNotValidException</code>이 발생합니다. 11장에서 만든 <code>validation()</code> 처리기가 이 예외를 잡아 첫 번째 오류 메시지로 400 응답을 만듭니다. 그래서 로그인용 처리기를 새로 만들 필요가 없습니다. 두 값을 모두 비워 보내면 오류가 두 개 생기는데, 어느 메시지가 첫 번째로 나올지는 보장되지 않습니다.</p><nav class="chapter-nav"><button type="button" class="text" data-prev="true" data-href="11.html">← 이전 장</button><span>12 / 26</span><button type="button" class="text" data-next="true" data-href="13.html">다음 장 →</button></nav></section></main></div><script src="../assets/book-6d8228e561daa8ba.js"></script></body></html>

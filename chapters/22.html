@@ -1,0 +1,279 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"><meta name="viewport" content="width=device-width,initial-scale=1"><title>스프링부트4로배우는 REST API </title><link rel="stylesheet" href="../assets/book-5206c2e7258828b8.css"></head><body><div class="reader" data-toc="open"><header class="book-bar"><button type="button" class="toc-toggle" aria-expanded="true" aria-controls="toc">목차</button><span class="book-bar__title">스프링부트4로배우는 REST API </span></header><aside class="toc" id="toc"><p class="caption">목차 / CONTENTS</p><div class="toc-title">스프링부트4로배우는 REST API </div><a href="../index.html" data-chapter="0" title="표지" aria-current="false">표지</a><a href="01.html" data-chapter="1" title="1장. Spring Boot 실행 환경" aria-current="false">1장. Spring Boot 실행 환경</a><a href="02.html" data-chapter="2" title="2장. 빈과 의존성 주입이란?" aria-current="false">2장. 빈과 의존성 주입이란?</a><a href="03.html" data-chapter="3" title="3장. REST API란?" aria-current="false">3장. REST API란?</a><a href="04.html" data-chapter="4" title="4장. 데이터베이스와 SQL이란?" aria-current="false">4장. 데이터베이스와 SQL이란?</a><a href="05.html" data-chapter="5" title="5장. JPA 엔티티란?" aria-current="false">5장. JPA 엔티티란?</a><a href="06.html" data-chapter="6" title="6장. REST API 계층 구조란?" aria-current="false">6장. REST API 계층 구조란?</a><a href="07.html" data-chapter="7" title="7장. 예외 처리란?" aria-current="false">7장. 예외 처리란?</a><a href="08.html" data-chapter="8" title="8장. 페이징이란?" aria-current="false">8장. 페이징이란?</a><a href="09.html" data-chapter="9" title="9장. Spring Security란?" aria-current="false">9장. Spring Security란?</a><a href="10.html" data-chapter="10" title="10장. 비밀번호 암호화란?" aria-current="false">10장. 비밀번호 암호화란?</a><a href="11.html" data-chapter="11" title="11장. 입력값 검증이란?" aria-current="false">11장. 입력값 검증이란?</a><a href="12.html" data-chapter="12" title="12장. JWT란?" aria-current="false">12장. JWT란?</a><a href="13.html" data-chapter="13" title="13장. CORS란?" aria-current="false">13장. CORS란?</a><a href="14.html" data-chapter="14" title="14장. 인증 필터란?" aria-current="false">14장. 인증 필터란?</a><a href="15.html" data-chapter="15" title="15장. 인가란?" aria-current="false">15장. 인가란?</a><a href="16.html" data-chapter="16" title="16장. 양방향 연관관계란?" aria-current="false">16장. 양방향 연관관계란?</a><a href="17.html" data-chapter="17" title="17장. 내 글 표시와 내 정보 수정" aria-current="false">17장. 내 글 표시와 내 정보 수정</a><a href="18.html" data-chapter="18" title="18장. 역할 기반 접근 제어란?" aria-current="false">18장. 역할 기반 접근 제어란?</a><a href="19.html" data-chapter="19" title="19장. 리프레시 토큰이란?" aria-current="false">19장. 리프레시 토큰이란?</a><a href="20.html" data-chapter="20" title="20장. 블로그 API 완성 점검" aria-current="false">20장. 블로그 API 완성 점검</a><a href="21.html" data-chapter="21" title="21장. 프로필이란?" aria-current="false">21장. 프로필이란?</a><a href="22.html" data-chapter="22" title="22장. 환경 변수란?" aria-current="true">22장. 환경 변수란?</a><a href="23.html" data-chapter="23" title="23장. 파일 업로드란?" aria-current="false">23장. 파일 업로드란?</a><a href="24.html" data-chapter="24" title="24장. API 문서란?" aria-current="false">24장. API 문서란?</a><a href="25.html" data-chapter="25" title="25장. 단위 테스트란?" aria-current="false">25장. 단위 테스트란?</a><a href="26.html" data-chapter="26" title="26장. 통합 테스트란?" aria-current="false">26장. 통합 테스트란?</a><footer>26장</footer></aside><main class="reading"><section class="chapter" id="chapter-22"><div class="eyebrow">스프링부트4로배우는 REST API  / CHAPTER 22</div><span class="chapter-num" aria-hidden="true">22</span><h2>22장. 환경 변수란?</h2><h3>1. 비밀값의 개념</h3>
+<h4>1.1 코드와 설정 파일에 비밀값을 두면 생기는 문제</h4>
+<p><strong>비밀값(secret)</strong>은 남에게 알려지는 순간 서비스가 위험해지는 값입니다. 블로그 API에서는 JWT 서명에 쓰는 비밀키와 데이터베이스 접속 비밀번호가 비밀값입니다. 서명 키를 아는 사람은 아무 회원 번호나 넣은 토큰을 직접 만들 수 있습니다. 서버는 서명만 확인하므로 이 가짜 토큰도 진짜로 믿습니다. DB 비밀번호가 새면 API를 거치지 않고 회원 테이블을 통째로 읽을 수 있습니다.</p>
+<p>12장에서는 <code>JwtUtil</code>이 비밀키를 <code>@Value</code>로 설정값에서 받게 했습니다. 코드에서는 키가 빠졌지만, 키 문자열은 아직 <code>application.properties</code>에 적혀 있습니다. 설정 파일은 소스 코드와 함께 Git 저장소에 올라갑니다. 그래서 이 상태에서는 다음 문제가 남습니다.</p>
+<table><thead><tr><th>문제</th><th>블로그 API에서 생기는 일</th></tr></thead><tbody><tr><td>저장소에 남는다</td><td>저장소를 볼 수 있는 사람은 모두 서명 키를 압니다. 파일에서 지워도 Git 기록에는 예전 커밋으로 남습니다.</td></tr><tr><td>환경마다 같은 값을 쓴다</td><td>개발용 키와 운영용 키가 같아서, 개발자 PC에서 만든 토큰이 운영 서버에서도 통합니다.</td></tr><tr><td>바꾸려면 다시 빌드한다</td><td>키가 새어 바꿔야 할 때 파일을 고치고 빌드와 배포를 다시 해야 합니다.</td></tr></tbody></table>
+<p>비밀값을 설정 파일에서 빼면 세 문제가 함께 풀립니다. 설정 파일에는 &quot;이 값은 바깥에서 받는다&quot;는 자리만 남기고, 실제 값은 서버를 실행하는 쪽에서 넣습니다. 이때 값을 넘기는 통로가 환경 변수입니다.</p>
+<h4>1.2 환경 변수란?</h4>
+<p><strong>환경 변수(environment variable)</strong>는 운영체제가 실행 중인 프로그램에 넘겨주는 <code>이름=값</code> 쌍입니다. 프로그램은 시작할 때 자기를 실행한 쪽(PowerShell, IntelliJ, 나중에는 Docker 컨테이너)에서 환경 변수 목록을 물려받습니다. 자바에서는 <code>System.getenv(&quot;이름&quot;)</code>으로 읽습니다. Spring Boot는 이 목록을 설정값을 찾는 곳 가운데 하나로 씁니다.</p>
+<p>환경 변수는 프로그램 파일 밖에 있습니다. 그래서 코드와 설정 파일은 그대로 두고, 실행하는 곳마다 다른 값을 넣을 수 있습니다. 개발자 PC에는 개발용 키를, 운영 서버에는 운영용 키를 넣는 식입니다. 실제 값이 저장소에 올라가지 않는 것도 이 방식의 장점입니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-1a5a92a08813"><div class="figure-scroll"><img src="../assets/img/a4e50d09ae858a46.png" alt="설정 파일 밖에서 들어오는 비밀값" data-raster="true"/></div><figcaption>설정 파일 밖에서 들어오는 비밀값</figcaption></figure>
+<p>그림 22-1처럼 저장소에는 <code>${JWT_SECRET}</code>이라는 자리만 올라갑니다. 열쇠에 해당하는 실제 값은 서버를 실행하는 컴퓨터에만 있습니다.</p>
+<p>후속 과정에서 Docker로 서버를 AWS에 올릴 때도 같은 방식으로 비밀값을 넣습니다. 컨테이너를 실행하면서 환경 변수를 넘기면 됩니다. 이 장에서 설정 파일을 환경 변수 기준으로 바꿔 두면 배포할 때 코드를 고칠 일이 없습니다.</p>
+<h3>2. 설정값에서 환경 변수 읽기</h3>
+<h4>2.1 ${이름:기본값} 플레이스홀더</h4>
+<p><strong>플레이스홀더(placeholder)</strong>는 설정값 안에 다른 값이 들어갈 자리를 표시하는 문법입니다. Spring Boot는 서버를 시작할 때 <code>${이름}</code> 자리를 찾습니다. 그리고 그 이름의 값을 환경 변수, 자바 시스템 속성, 다른 설정 키 같은 곳에서 찾아 바꿔 넣습니다. 이름 뒤에 콜론(<code>:</code>)을 붙이면 값을 찾지 못했을 때 쓸 기본값을 정할 수 있습니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="properties"><div class="code-label"><span class="code-label__name">PROPERTIES</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2</div><pre><code data-code="설정키=${환경변수이름}
+설정키=${환경변수이름:기본값}">설정키=${환경변수이름}
+설정키=${환경변수이름:기본값}</code></pre></div></div>
+<p>세 형태는 값을 찾지 못했을 때 다르게 동작합니다.</p>
+<table><thead><tr><th>형태</th><th>값을 찾았을 때</th><th>값을 찾지 못했을 때</th></tr></thead><tbody><tr><td><code>${JWT_SECRET}</code></td><td>찾은 값</td><td>서버가 시작되지 않음</td></tr><tr><td><code>${JWT_SECRET:abc}</code></td><td>찾은 값</td><td><code>abc</code></td></tr><tr><td><code>${JWT_SECRET:}</code></td><td>찾은 값</td><td>빈 문자열</td></tr></tbody></table>
+<p>12장에서 쓴 <code>@Value(&quot;${app.jwt.secret}&quot;)</code>도 같은 플레이스홀더입니다. <code>@Value</code>는 설정 키 <code>app.jwt.secret</code>을 찾습니다. 설정 파일에 적힌 그 키의 값이 다시 <code>${JWT_SECRET}</code>이면, 스프링은 한 번 더 환경 변수를 찾습니다. 그래서 <code>JwtUtil</code> 코드는 그대로 두고 설정 파일의 값만 바꾸면 됩니다.</p>
+<h4>2.2 JWT 비밀키를 환경 변수로 바꾸기</h4>
+<p>21장에서 나눈 공통 설정 파일에서 서명 키 줄을 플레이스홀더로 바꿉니다. 환경 변수를 넣지 않아도 서버가 뜨도록, 지금까지 쓰던 개발용 키를 기본값으로 둡니다.</p>
+<p><strong>예제 22-1 — 서명 키를 환경 변수에서 받기</strong></p>
+<p><strong>이어서:</strong> 예제 21-4</p>
+<p><strong>파일명:</strong> <code>src/main/resources/application.properties</code></p>
+<div class="code-wrap" data-kind="code" data-lang="properties"><div class="code-label"><span class="code-label__name">PROPERTIES</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</div><pre><code data-code="server.port=8080
+spring.servlet.encoding.charset=UTF-8
+spring.servlet.encoding.force=true
+
+spring.profiles.default=dev
+
+spring.jpa.open-in-view=false
+
+app.cors.allowed-origins=http://localhost:5173
+
+app.jwt.secret=${JWT_SECRET:newtenco-blog-jwt-secret-key-must-be-at-least-64-bytes-long-0123456789}
+app.jwt.expiration-time=86400000">server.port=8080
+spring.servlet.encoding.charset=UTF-8
+spring.servlet.encoding.force=true
+
+spring.profiles.default=dev
+
+spring.jpa.open-in-view=false
+
+app.cors.allowed-origins=http://localhost:5173
+
+app.jwt.secret=${JWT_SECRET:newtenco-blog-jwt-secret-key-must-be-at-least-64-bytes-long-0123456789}
+app.jwt.expiration-time=86400000</code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>PowerShell에서 환경 변수를 넣지 않고 <code>.\gradlew.bat bootRun</code>으로 실행합니다. 서버는 dev 프로필로 시작됩니다. <code>POST /login</code>으로 <code>ssar</code>이 로그인하면 이전처럼 <code>Authorization</code> 헤더에 토큰이 담겨 옵니다. <code>JWT_SECRET</code>이 없으니 기본값이 쓰였고, 이 값은 지금까지 쓰던 키와 같습니다. 그래서 서버를 다시 켜기 전에 받은 토큰도 그대로 통합니다.</p>
+<p>만료 시간 <code>app.jwt.expiration-time</code>은 플레이스홀더로 바꾸지 않았습니다. 만료 시간은 알려져도 위험하지 않으므로 설정 파일에 남겨도 됩니다. 환경 변수로 빼는 값은 비밀값과, 실행 환경마다 달라지는 값으로 한정합니다.</p>
+<p>이 예제는 아직 완성이 아닙니다. 키 문자열이 기본값 자리에 남아 있어서 여전히 저장소에 올라갑니다. 기본값을 dev 설정으로 옮기고, 운영에서는 기본값이 없게 하는 작업은 3.3에서 합니다.</p>
+<h4>2.3 DB 접속 정보를 환경 변수로 바꾸기</h4>
+<p>dev 프로필은 서버 안에서 만들고 지우는 H2 메모리 DB를 쓰므로 접속 정보를 숨길 이유가 없습니다. 숨겨야 하는 쪽은 21장에서 자리만 만들어 둔 prod 프로필의 DB 접속 정보입니다. 주소, 사용자 이름, 비밀번호를 모두 환경 변수로 받게 바꿉니다.</p>
+<p><strong>예제 22-2 — 운영 DB 접속 정보를 환경 변수에서 받기</strong></p>
+<p><strong>이어서:</strong> 예제 22-1</p>
+<p><strong>파일명:</strong> <code>src/main/resources/application-prod.properties</code></p>
+<div class="code-wrap" data-kind="code" data-lang="properties"><div class="code-label"><span class="code-label__name">PROPERTIES</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</div><pre><code data-code="spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.h2.console.enabled=false
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+
+app.cors.allowed-origins=https://blog.example.com">spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.h2.console.enabled=false
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+
+app.cors.allowed-origins=https://blog.example.com</code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p><code>.\gradlew.bat bootRun</code>으로 실행하면 dev 프로필이 쓰이므로 동작은 예제 22-1과 같습니다. prod 프로필은 3.1에서 세 환경 변수를 넣은 뒤 실행합니다.</p>
+<p>세 값에는 기본값을 두지 않았습니다. 운영 DB 정보는 개발자 PC에 기본으로 적어 둘 값이 아니기 때문입니다. 주소도 환경 변수로 받으므로, 후속 과정에서 AWS RDS로 옮길 때 이 파일은 고치지 않습니다. 실행할 때 넣는 <code>DB_URL</code> 값만 바뀝니다.</p>
+<p><code>spring.datasource.driver-class-name</code>은 적지 않았습니다. Spring Boot는 주소가 <code>jdbc:h2:</code>로 시작하면 H2 드라이버를, <code>jdbc:mysql:</code>로 시작하면 MySQL 드라이버를 골라 씁니다. 드라이버까지 적어 두면 DB를 바꿀 때 주소와 드라이버 두 줄을 함께 고쳐야 합니다.</p>
+<p>나머지 줄은 21장 예제 21-3과 같습니다. H2 콘솔과 SQL 출력은 끄고, <code>ddl-auto</code>는 21장 3.2에서 정한 대로 <code>validate</code>로 둡니다. CORS 허용 출처도 실제 프런트엔드 주소로 덮어씁니다.</p>
+<h4>2.4 환경 변수 이름과 설정 키의 연결</h4>
+<p>설정 키와 환경 변수는 두 가지 방법으로 이어집니다.</p>
+<p>첫째는 지금까지 쓴 방법입니다. 설정 파일에 <code>${JWT_SECRET}</code>처럼 플레이스홀더를 적으면 그 이름의 환경 변수를 찾습니다. 이름은 마음대로 정할 수 있고, 설정 파일만 봐도 어떤 값을 바깥에서 받는지 한눈에 보입니다.</p>
+<p>둘째는 Spring Boot가 설정 키를 환경 변수 이름으로 바꿔서 자동으로 찾는 방법입니다. 대부분의 운영체제는 환경 변수 이름에 점(<code>.</code>)을 쓰지 못하게 합니다. 그래서 Spring Boot는 설정 키를 다음 규칙으로 바꾼 이름의 환경 변수도 찾습니다.</p>
+<ol>
+<li>점(<code>.</code>)을 밑줄(<code>_</code>)로 바꿉니다.</li>
+<li>하이픈(<code>-</code>)은 지웁니다.</li>
+<li>모두 대문자로 씁니다.</li>
+</ol>
+<table><thead><tr><th>설정 키</th><th>자동으로 찾는 환경 변수</th></tr></thead><tbody><tr><td><code>app.jwt.secret</code></td><td><code>APP_JWT_SECRET</code></td></tr><tr><td><code>app.jwt.expiration-time</code></td><td><code>APP_JWT_EXPIRATIONTIME</code></td></tr><tr><td><code>spring.datasource.url</code></td><td><code>SPRING_DATASOURCE_URL</code></td></tr><tr><td><code>spring.jpa.hibernate.ddl-auto</code></td><td><code>SPRING_JPA_HIBERNATE_DDLAUTO</code></td></tr></tbody></table>
+<p>Spring Boot가 설정값을 찾는 순서에서 운영체제 환경 변수는 <code>application.properties</code>와 프로필 파일보다 앞섭니다. 그래서 <code>APP_JWT_SECRET</code>을 넣으면 설정 파일에 무엇이 적혀 있든 환경 변수의 값이 쓰입니다. 명령줄 인수 <code>--args=&quot;--설정키=값&quot;</code>은 환경 변수보다도 앞섭니다.</p>
+<p><code>@Value</code>에서도 이 규칙이 통하려면 코드에 적는 키가 소문자와 하이픈으로 된 표준 형태여야 합니다. <code>@Value(&quot;${app.jwt.expiration-time}&quot;)</code>은 <code>APP_JWT_EXPIRATIONTIME</code>을 찾습니다. 반면 <code>@Value(&quot;${app.jwt.expirationTime}&quot;)</code>처럼 쓰면 <code>app.jwt.expiration-time</code>으로 적은 설정 키를 찾지 못합니다.</p>
+<p>이 책은 첫째 방법을 씁니다. 자동 규칙에만 기대면 설정 파일에는 개발용 값이 적혀 있는데 실제로는 바깥 값이 쓰이는 일이 생깁니다. 그러면 어느 값이 쓰였는지 파일만 봐서는 알 수 없습니다. 둘째 방법은 알고만 있으면 됩니다. 누군가 우연히 <code>SPRING_JPA_HIBERNATE_DDLAUTO</code> 같은 환경 변수를 넣어 두었다면, 서버가 설정 파일과 다르게 동작하는 원인이 여기에 있습니다.</p>
+<h3>3. 환경 변수 넣고 실행하기</h3>
+<h4>3.1 PowerShell에서 $env:로 설정하기</h4>
+<p>PowerShell에서는 <code>$env:이름</code>에 값을 대입해 환경 변수를 만듭니다. 이렇게 만든 값은 지금 열린 PowerShell 창과, 그 창에서 실행한 프로그램에만 보입니다. 창을 닫으면 사라지고, 다른 창에서는 보이지 않습니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="command" data-lang="powershell"><div class="code-label"><span class="code-label__name">터미널</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2</div><pre><code data-code="$env:이름=&quot;값&quot;
+$env:이름"><span><span class="cmd-line">$env:이름=&quot;값&quot;</span></span><span>
+<span class="cmd-line">$env:이름</span></span></code></pre></div></div>
+<p>첫 줄은 값을 넣고, 둘째 줄은 넣은 값을 출력합니다.</p>
+<p>운영용 서명 키는 사람이 지어내지 않고 무작위로 만듭니다. HS512 서명 키는 64바이트 이상이어야 합니다. 다음 명령은 무작위 64바이트를 만들어 Base64 문자열로 출력합니다. 출력된 문자열은 88글자입니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="command" data-lang="powershell"><div class="code-label"><span class="code-label__name">터미널</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3</div><pre><code data-code="$bytes = New-Object byte[] 64
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+[Convert]::ToBase64String($bytes)"><span><span class="cmd-line">$bytes = New-Object byte[] 64</span></span><span>
+<span class="cmd-line">[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)</span></span><span>
+<span class="cmd-line">[Convert]::ToBase64String($bytes)</span></span></code></pre></div></div>
+<p>출력된 문자열을 복사해 <code>JWT_SECRET</code>에 넣고, DB 접속 정보 세 개도 넣은 뒤 prod 프로필로 실행합니다. 연습용 운영 DB로는 H2 파일 DB를 씁니다. 데이터는 프로젝트 폴더 아래 <code>db</code> 폴더에 파일로 저장됩니다.</p>
+<p>이 파일 DB는 처음에 비어 있어서 테이블이 하나도 없습니다. prod 설정의 <code>ddl-auto=validate</code>는 테이블을 검사만 하므로, 그대로 실행하면 테이블이 없다는 오류로 서버가 멈춥니다. 그래서 이 연습에서만 명령줄 인수로 <code>ddl-auto</code>를 <code>update</code>로 덮어써 Hibernate가 테이블을 만들게 합니다. 2.4에서 본 것처럼 명령줄 인수는 설정 파일과 환경 변수보다 앞섭니다. 한 번 만든 테이블은 파일에 남으므로 다음 실행부터는 이 인수가 없어도 <code>validate</code>를 통과합니다. 실제 운영 DB의 테이블은 SQL로 직접 만들고 관리하므로 이 인수를 넣지 않습니다.</p>
+<p><strong>예제 22-3 — 환경 변수를 넣고 prod로 실행하기</strong></p>
+<p><strong>이어서:</strong> 예제 22-2</p>
+<p><strong>파일명:</strong> PowerShell 명령</p>
+<div class="code-wrap" data-kind="command" data-lang="powershell"><div class="code-label"><span class="code-label__name">터미널</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6</div><pre><code data-code="$env:JWT_SECRET=&quot;(위 명령으로 만든 88글자 문자열)&quot;
+$env:DB_URL=&quot;jdbc:h2:file:./db/blog&quot;
+$env:DB_USERNAME=&quot;sa&quot;
+$env:DB_PASSWORD=&quot;prod1234&quot;
+
+.\gradlew.bat bootRun --args=&quot;--spring.profiles.active=prod --spring.jpa.hibernate.ddl-auto=update&quot;"><span><span class="cmd-line">$env:JWT_SECRET=&quot;(위 명령으로 만든 88글자 문자열)&quot;</span></span><span>
+<span class="cmd-line">$env:DB_URL=&quot;jdbc:h2:file:./db/blog&quot;</span></span><span>
+<span class="cmd-line">$env:DB_USERNAME=&quot;sa&quot;</span></span><span>
+<span class="cmd-line">$env:DB_PASSWORD=&quot;prod1234&quot;</span></span><span>
+<span class="cmd-line"></span></span><span>
+<span class="cmd-line">.\gradlew.bat bootRun --args=&quot;--spring.profiles.active=prod --spring.jpa.hibernate.ddl-auto=update&quot;</span></span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>실행 로그에 활성 프로필이 prod로 찍히고, 서버가 오류 없이 시작됩니다.</p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="The following 1 profile is active: &quot;prod&quot;">The following 1 profile is active: &quot;prod&quot;</code></pre></div></div>
+<p>prod에서는 <code>data.sql</code>이 실행되지 않으므로 DB가 비어 있습니다. Postman으로 <code>POST /join</code>을 보내 회원을 하나 만들고, <code>POST /login</code>으로 로그인하면 토큰이 발급됩니다. 이 토큰은 새로 넣은 운영용 키로 서명되어 있습니다.</p>
+<p>프로젝트 폴더에는 <code>db/blog.mv.db</code> 파일이 생깁니다. 이 DB는 처음 접속할 때 <code>DB_USERNAME</code>과 <code>DB_PASSWORD</code>로 계정을 만듭니다. 다음에 다른 비밀번호를 넣고 실행하면 접속이 거부됩니다. 실제 DB 파일이 저장소에 올라가지 않도록 <code>.gitignore</code>에 <code>db/</code>를 넣어 둡니다.</p>
+<p>키가 정말 바뀌었는지는 dev 서버에서 받은 토큰으로 확인합니다. dev 프로필로 실행해 <code>ssar</code>로 로그인하고, 받은 토큰을 복사해 둡니다. 서버를 끄고 위처럼 prod로 다시 실행합니다. 복사해 둔 토큰을 <code>Authorization</code> 헤더에 실어 <code>POST /api/boards</code>를 보내면 401 응답이 돌아옵니다. 두 서버의 서명 키가 달라서, dev 키로 만든 서명이 prod 키 검증을 통과하지 못하기 때문입니다. 1.1에서 말한 &quot;개발 PC의 토큰이 운영 서버에서 통하는&quot; 문제가 사라졌습니다.</p>
+<p><code>gradlew.bat</code>은 Gradle을 거쳐 서버를 실행합니다. Gradle은 자기를 실행한 PowerShell의 환경 변수를 서버 프로세스에 그대로 넘깁니다. 환경 변수를 넣기 전에 띄운 서버가 있다면 끄고 다시 실행해야 새 값이 들어갑니다. 프로그램은 시작할 때 환경 변수를 한 번 물려받을 뿐, 그 뒤에 바뀐 값은 보지 못합니다.</p>
+<h4>3.2 IntelliJ 실행 설정에 환경 변수 넣기</h4>
+<p>IntelliJ의 실행 버튼으로 서버를 띄우면 PowerShell 창에서 넣은 <code>$env:</code> 값이 전달되지 않습니다. IntelliJ가 서버를 직접 실행하기 때문입니다. 이때는 실행 설정에 환경 변수를 넣습니다.</p>
+<ol>
+<li>Run &gt; Edit Configurations...를 엽니다.</li>
+<li>왼쪽 목록에서 <code>BlogApplication</code>을 고릅니다.</li>
+<li>21장에서 쓴 Program arguments 칸에 <code>--spring.profiles.active=prod</code>를 적습니다. Ultimate의 Spring Boot 실행 설정이라면 Active profiles 칸에 <code>prod</code>만 적어도 됩니다.</li>
+<li>Environment variables 칸이 보이지 않으면 Modify options를 눌러 Environment variables를 켭니다.</li>
+<li>Environment variables 칸에 <code>이름=값</code>을 세미콜론(<code>;</code>)으로 이어 적습니다.</li>
+<li>OK를 누르고 실행합니다.</li>
+</ol>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="JWT_SECRET=(만든 88글자 문자열);DB_URL=jdbc:h2:file:./db/blog;DB_USERNAME=sa;DB_PASSWORD=prod1234">JWT_SECRET=(만든 88글자 문자열);DB_URL=jdbc:h2:file:./db/blog;DB_USERNAME=sa;DB_PASSWORD=prod1234</code></pre></div></div>
+<p>칸 오른쪽 아이콘을 누르면 표 모양 창이 열립니다. 이 창에서 이름과 값을 한 줄씩 넣어도 됩니다.</p>
+<figure class="book-figure blank" data-type="empty" id="figure-78b280d8176b"><p class="blank__what">IntelliJ의 Run/Debug Configurations 창에서 BlogApplication을 고른 화면</p><p class="blank__why">아직 그림이 없습니다</p></figure>
+<p>실행 설정은 기본으로 프로젝트 <code>.idea</code> 폴더 안의 개인 작업 파일에 저장되므로 Git으로 공유되지 않습니다. 실행 설정 창에서 Store as project file을 켜면 공유용 파일로 저장됩니다. 비밀값을 넣은 실행 설정에서는 이 옵션을 켜지 않습니다.</p>
+<h4>3.3 비밀값이 없을 때 실행을 멈추게 하기</h4>
+<p>예제 22-1의 공통 설정에는 아직 개발용 키가 기본값으로 들어 있습니다. 이 상태에서 <code>JWT_SECRET</code>을 빠뜨리고 prod를 실행하면 어떻게 될까요? 서버는 아무 경고 없이, 저장소에 공개된 개발용 키로 토큰을 서명합니다. 비밀값이 빠졌다면 서버가 아예 시작되지 않는 편이 안전합니다.</p>
+<p>그래서 공통 설정에서는 기본값을 지우고, 개발용 키는 dev 설정에만 기본값으로 둡니다. 프로필 파일의 값은 공통 파일의 같은 키보다 앞서므로, dev로 실행하면 dev 파일의 줄이 쓰입니다.</p>
+<p><strong>예제 22-4 — prod에서 서명 키가 없으면 멈추기</strong></p>
+<p><strong>이어서:</strong> 예제 22-3</p>
+<p><strong>파일명:</strong> <code>src/main/resources/application.properties</code></p>
+<div class="code-wrap" data-kind="code" data-lang="properties"><div class="code-label"><span class="code-label__name">PROPERTIES</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</div><pre><code data-code="server.port=8080
+spring.servlet.encoding.charset=UTF-8
+spring.servlet.encoding.force=true
+
+spring.profiles.default=dev
+
+spring.jpa.open-in-view=false
+
+app.cors.allowed-origins=http://localhost:5173
+
+app.jwt.secret=${JWT_SECRET}
+app.jwt.expiration-time=86400000">server.port=8080
+spring.servlet.encoding.charset=UTF-8
+spring.servlet.encoding.force=true
+
+spring.profiles.default=dev
+
+spring.jpa.open-in-view=false
+
+app.cors.allowed-origins=http://localhost:5173
+
+app.jwt.secret=${JWT_SECRET}
+app.jwt.expiration-time=86400000</code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/resources/application-dev.properties</code></p>
+<div class="code-wrap" data-kind="code" data-lang="properties"><div class="code-label"><span class="code-label__name">PROPERTIES</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</div><pre><code data-code="spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:test
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.sql.init.data-locations=classpath:db/data.sql
+spring.jpa.defer-datasource-initialization=true
+
+app.jwt.secret=${JWT_SECRET:newtenco-blog-jwt-secret-key-must-be-at-least-64-bytes-long-0123456789}">spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:mem:test
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true
+
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.sql.init.data-locations=classpath:db/data.sql
+spring.jpa.defer-datasource-initialization=true
+
+app.jwt.secret=${JWT_SECRET:newtenco-blog-jwt-secret-key-must-be-at-least-64-bytes-long-0123456789}</code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>새 PowerShell 창을 엽니다. 환경 변수 없이 <code>.\gradlew.bat bootRun</code>으로 실행하면 dev 프로필이 쓰입니다. dev 파일의 기본값 덕분에 서버는 이전처럼 시작됩니다.</p>
+<p>같은 창에서 DB 환경 변수 세 개만 넣고, <code>JWT_SECRET</code>은 빼고 prod로 실행합니다.</p>
+<div class="code-wrap" data-kind="command" data-lang="powershell"><div class="code-label"><span class="code-label__name">터미널</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code data-code="$env:DB_URL=&quot;jdbc:h2:file:./db/blog&quot;
+$env:DB_USERNAME=&quot;sa&quot;
+$env:DB_PASSWORD=&quot;prod1234&quot;
+
+.\gradlew.bat bootRun --args=&quot;--spring.profiles.active=prod&quot;"><span><span class="cmd-line">$env:DB_URL=&quot;jdbc:h2:file:./db/blog&quot;</span></span><span>
+<span class="cmd-line">$env:DB_USERNAME=&quot;sa&quot;</span></span><span>
+<span class="cmd-line">$env:DB_PASSWORD=&quot;prod1234&quot;</span></span><span>
+<span class="cmd-line"></span></span><span>
+<span class="cmd-line">.\gradlew.bat bootRun --args=&quot;--spring.profiles.active=prod&quot;</span></span></code></pre></div></div>
+<p>서버가 시작되다가 멈춥니다. 오류 로그에서 다음 문장을 찾을 수 있습니다.</p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="Could not resolve placeholder &#x27;JWT_SECRET&#x27;">Could not resolve placeholder &#x27;JWT_SECRET&#x27;</code></pre></div></div>
+<p><code>JWT_SECRET</code>을 넣고 다시 실행하면 서버가 정상으로 시작됩니다.</p>
+<p>오류 문장은 &quot;<code>JWT_SECRET</code> 자리에 넣을 값을 어디서도 찾지 못했다&quot;는 뜻입니다. 스프링은 <code>JwtUtil</code> 빈을 만들면서 <code>@Value(&quot;${app.jwt.secret}&quot;)</code>의 값을 찾습니다. prod 파일에는 이 키를 덮어쓰는 줄이 없으므로 공통 파일의 <code>${JWT_SECRET}</code>이 쓰입니다. 그런데 기본값이 없으니 스프링은 빈을 만들지 못합니다. 2장에서 본 것처럼 빈 하나를 만들지 못하면 애플리케이션 전체가 시작되지 않습니다.</p>
+<p>빠진 값을 시작 단계에서 잡으면 잘못된 서버가 요청을 받기 전에 멈춥니다. 무엇이 빠졌는지도 로그 한 줄로 알 수 있습니다. 반대로 개발용 키로 조용히 동작하는 서버는 문제를 알아채기 어렵습니다. DB 환경 변수 세 개도 기본값이 없으므로, 하나라도 빠지면 같은 방식으로 멈춥니다.</p>
+<p>이제 저장소에 남은 키는 dev 파일의 개발용 키뿐입니다. 이 키는 공개되어도 되는 학습용 값이고, prod에서는 절대 쓰이지 않습니다. 단, 21장에서 기본 프로필을 dev로 정했으므로, 운영 서버를 띄울 때 <code>--spring.profiles.active=prod</code>를 빠뜨리면 dev 설정과 개발용 키로 실행됩니다. 운영에서는 활성 프로필도 서명 키처럼 반드시 넣어야 하는 값으로 다룹니다.</p>
+<table><thead><tr><th>실행</th><th><code>JWT_SECRET</code> 있음</th><th><code>JWT_SECRET</code> 없음</th></tr></thead><tbody><tr><td>dev</td><td>넣은 값</td><td>dev 파일의 개발용 키</td></tr><tr><td>prod</td><td>넣은 값</td><td>서버가 시작되지 않음</td></tr></tbody></table><nav class="chapter-nav"><button type="button" class="text" data-prev="true" data-href="21.html">← 이전 장</button><span>22 / 26</span><button type="button" class="text" data-next="true" data-href="23.html">다음 장 →</button></nav></section></main></div><script src="../assets/book-6d8228e561daa8ba.js"></script></body></html>

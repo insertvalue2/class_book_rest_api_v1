@@ -1,0 +1,596 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"><meta name="viewport" content="width=device-width,initial-scale=1"><title>스프링부트4로배우는 REST API </title><link rel="stylesheet" href="../assets/book-5206c2e7258828b8.css"></head><body><div class="reader" data-toc="open"><header class="book-bar"><button type="button" class="toc-toggle" aria-expanded="true" aria-controls="toc">목차</button><span class="book-bar__title">스프링부트4로배우는 REST API </span></header><aside class="toc" id="toc"><p class="caption">목차 / CONTENTS</p><div class="toc-title">스프링부트4로배우는 REST API </div><a href="../index.html" data-chapter="0" title="표지" aria-current="false">표지</a><a href="01.html" data-chapter="1" title="1장. Spring Boot 실행 환경" aria-current="false">1장. Spring Boot 실행 환경</a><a href="02.html" data-chapter="2" title="2장. 빈과 의존성 주입이란?" aria-current="false">2장. 빈과 의존성 주입이란?</a><a href="03.html" data-chapter="3" title="3장. REST API란?" aria-current="false">3장. REST API란?</a><a href="04.html" data-chapter="4" title="4장. 데이터베이스와 SQL이란?" aria-current="false">4장. 데이터베이스와 SQL이란?</a><a href="05.html" data-chapter="5" title="5장. JPA 엔티티란?" aria-current="false">5장. JPA 엔티티란?</a><a href="06.html" data-chapter="6" title="6장. REST API 계층 구조란?" aria-current="true">6장. REST API 계층 구조란?</a><a href="07.html" data-chapter="7" title="7장. 예외 처리란?" aria-current="false">7장. 예외 처리란?</a><a href="08.html" data-chapter="8" title="8장. 페이징이란?" aria-current="false">8장. 페이징이란?</a><a href="09.html" data-chapter="9" title="9장. Spring Security란?" aria-current="false">9장. Spring Security란?</a><a href="10.html" data-chapter="10" title="10장. 비밀번호 암호화란?" aria-current="false">10장. 비밀번호 암호화란?</a><a href="11.html" data-chapter="11" title="11장. 입력값 검증이란?" aria-current="false">11장. 입력값 검증이란?</a><a href="12.html" data-chapter="12" title="12장. JWT란?" aria-current="false">12장. JWT란?</a><a href="13.html" data-chapter="13" title="13장. CORS란?" aria-current="false">13장. CORS란?</a><a href="14.html" data-chapter="14" title="14장. 인증 필터란?" aria-current="false">14장. 인증 필터란?</a><a href="15.html" data-chapter="15" title="15장. 인가란?" aria-current="false">15장. 인가란?</a><a href="16.html" data-chapter="16" title="16장. 양방향 연관관계란?" aria-current="false">16장. 양방향 연관관계란?</a><a href="17.html" data-chapter="17" title="17장. 내 글 표시와 내 정보 수정" aria-current="false">17장. 내 글 표시와 내 정보 수정</a><a href="18.html" data-chapter="18" title="18장. 역할 기반 접근 제어란?" aria-current="false">18장. 역할 기반 접근 제어란?</a><a href="19.html" data-chapter="19" title="19장. 리프레시 토큰이란?" aria-current="false">19장. 리프레시 토큰이란?</a><a href="20.html" data-chapter="20" title="20장. 블로그 API 완성 점검" aria-current="false">20장. 블로그 API 완성 점검</a><a href="21.html" data-chapter="21" title="21장. 프로필이란?" aria-current="false">21장. 프로필이란?</a><a href="22.html" data-chapter="22" title="22장. 환경 변수란?" aria-current="false">22장. 환경 변수란?</a><a href="23.html" data-chapter="23" title="23장. 파일 업로드란?" aria-current="false">23장. 파일 업로드란?</a><a href="24.html" data-chapter="24" title="24장. API 문서란?" aria-current="false">24장. API 문서란?</a><a href="25.html" data-chapter="25" title="25장. 단위 테스트란?" aria-current="false">25장. 단위 테스트란?</a><a href="26.html" data-chapter="26" title="26장. 통합 테스트란?" aria-current="false">26장. 통합 테스트란?</a><footer>26장</footer></aside><main class="reading"><section class="chapter" id="chapter-6"><div class="eyebrow">스프링부트4로배우는 REST API  / CHAPTER 06</div><span class="chapter-num" aria-hidden="true">06</span><h2>6장. REST API 계층 구조란?</h2><h3>1. 계층 구조의 개념</h3>
+<h4>1.1 Controller · Service · Repository의 역할</h4>
+<p>요청을 처리하는 코드를 한 클래스에 모두 넣으면 고칠 일이 생길 때마다 그 파일을 열어야 합니다. 주소가 바뀌어도, 업무 규칙이 바뀌어도, 조회 쿼리가 바뀌어도 고칠 곳은 같은 파일입니다. 그래서 하는 일에 따라 클래스를 세 계층으로 나눕니다. <strong>계층(layer)</strong>은 같은 종류의 일을 맡는 클래스들의 묶음입니다.</p>
+<table><thead><tr><th>계층</th><th>맡는 일</th><th>이 장에서 만드는 클래스</th></tr></thead><tbody><tr><td>Controller</td><td>HTTP 요청을 받고 응답을 돌려준다</td><td><code>BoardController</code></td></tr><tr><td>Service</td><td>업무 규칙과 트랜잭션을 맡는다</td><td><code>BoardService</code></td></tr><tr><td>Repository</td><td>데이터베이스에 접근한다</td><td><code>BoardRepository</code></td></tr></tbody></table>
+<figure class="book-figure" data-type="generated" id="figure-f0384fbe0191"><div class="figure-scroll"><img src="../assets/img/f78dfb112082ecc6.png" alt="요청이 세 계층을 지나는 길" data-raster="true"/></div><figcaption>요청이 세 계층을 지나는 길</figcaption></figure>
+<p>그림 6-1처럼 각 계층은 바로 옆 계층만 호출합니다. Controller는 데이터베이스를 모르고, Repository는 HTTP를 모릅니다. 주소 규칙이 바뀌면 Controller만 고치고, 조회 쿼리가 바뀌면 Repository만 고치면 됩니다.</p>
+<p>세 계층의 객체는 모두 빈입니다. Service는 Repository를, Controller는 Service를 2장에서 배운 생성자 주입으로 받습니다. 생성자는 Lombok의 <code>@RequiredArgsConstructor</code>로 만듭니다.</p>
+<h4>1.2 기능별 패키지 구성</h4>
+<p>클래스를 묶는 방법은 두 가지입니다. 계층별로 <code>controller</code>, <code>service</code>, <code>repository</code> 패키지를 만들 수도 있고, 기능별로 <code>board</code>, <code>user</code> 패키지를 만들 수도 있습니다. 이 책은 기능별 패키지를 씁니다.</p>
+<table><thead><tr><th>묶는 방법</th><th>패키지 예</th><th>글 기능을 고칠 때</th></tr></thead><tbody><tr><td>계층별</td><td><code>controller</code> · <code>service</code> · <code>repository</code></td><td>폴더 세 개를 오간다</td></tr><tr><td>기능별</td><td><code>board</code> · <code>user</code></td><td><code>board</code> 폴더 하나만 연다</td></tr></tbody></table>
+<p>이 장의 클래스는 5장에서 만든 <code>Board</code>가 있는 <code>com.newtenco.blog.board</code> 패키지에 함께 둡니다. 모든 기능이 함께 쓰는 클래스는 <code>core</code> 아래에 따로 둡니다. 이 장을 마치면 패키지와 클래스가 다음과 같이 놓입니다.</p>
+<table><thead><tr><th>패키지</th><th>클래스</th></tr></thead><tbody><tr><td><code>com.newtenco.blog</code></td><td><code>BlogApplication</code></td></tr><tr><td><code>com.newtenco.blog.board</code></td><td><code>Board</code>, <code>BoardController</code>, <code>BoardRepository</code>, <code>BoardResponse</code>, <code>BoardService</code></td></tr><tr><td><code>com.newtenco.blog.core.util</code></td><td><code>Resp</code></td></tr><tr><td><code>com.newtenco.blog.user</code></td><td><code>User</code></td></tr></tbody></table>
+<p>모든 패키지가 메인 클래스 <code>BlogApplication</code>이 있는 <code>com.newtenco.blog</code> 아래에 있습니다. 그래서 컴포넌트 스캔이 Controller와 Service를 빠짐없이 찾습니다.</p>
+<h3>2. Repository</h3>
+<h4>2.1 JpaRepository</h4>
+<p>Spring Data JPA에서는 Repository를 인터페이스로만 선언합니다. <strong>JpaRepository</strong>를 상속한 인터페이스를 만들어 두면 서버가 뜰 때 Spring Data JPA가 구현 객체를 만들어 빈으로 등록합니다. 구현 클래스는 직접 작성하지 않고, <code>@Repository</code> 애너테이션도 붙이지 않습니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2</div><pre><code class="language-java" data-code="public interface 리포지토리명 extends JpaRepository&lt;엔티티타입, ID타입&gt; {
+}"><span class="token keyword">public</span> <span class="token keyword">interface</span> 리포지토리명 <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token operator">&lt;</span>엔티티타입<span class="token punctuation">,</span> <span class="token constant">ID</span>타입<span class="token operator">></span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>첫 번째 타입 인자에는 다룰 엔티티를 적습니다. 두 번째에는 그 엔티티의 <code>@Id</code> 필드 타입을 적습니다. <code>Board</code>의 <code>id</code>가 <code>Integer</code>이므로 <code>JpaRepository&lt;Board, Integer&gt;</code>가 됩니다. 상속만 해도 다음 메서드를 쓸 수 있습니다.</p>
+<table><thead><tr><th>메서드</th><th>하는 일</th></tr></thead><tbody><tr><td><code>save(엔티티)</code></td><td>저장(새 엔티티면 <code>insert</code>)</td></tr><tr><td><code>findById(id)</code></td><td>id로 한 건 조회, <code>Optional</code>로 반환</td></tr><tr><td><code>findAll()</code></td><td>전체 조회</td></tr><tr><td><code>deleteById(id)</code></td><td>id로 삭제</td></tr><tr><td><code>count()</code></td><td>전체 개수</td></tr></tbody></table>
+<p>글 목록은 <code>findAll()</code>로도 가져올 수 있습니다. 하지만 최신 글이 앞에 와야 하고, 2.3에서 볼 N+1 문제도 피해야 합니다. 그래서 조회 메서드를 직접 만듭니다.</p>
+<h4>2.2 @Query와 JPQL</h4>
+<p><strong>@Query</strong>는 Repository 메서드에 실행할 쿼리를 직접 적는 애너테이션입니다. 여기에 쓰는 쿼리 언어가 <strong>JPQL(Jakarta Persistence Query Language)</strong>입니다. JPQL은 SQL과 문법이 비슷하지만 테이블이 아니라 엔티티를 대상으로 씁니다.</p>
+<table><thead><tr><th>구분</th><th>SQL</th><th>JPQL</th></tr></thead><tbody><tr><td>대상</td><td>테이블 <code>board_tb</code></td><td>엔티티 <code>Board</code></td></tr><tr><td>이름</td><td>열 이름 <code>user_id</code></td><td>필드 이름 <code>b.user</code></td></tr><tr><td>연관 데이터</td><td><code>on</code> 조건으로 외래 키 연결</td><td>필드로 따라가기(<code>join b.user</code>)</td></tr></tbody></table>
+<p>JPQL에 쓰는 <code>Board</code>는 엔티티 이름이며, 따로 정하지 않으면 클래스 이름과 같습니다. 그래서 대소문자까지 맞춰야 합니다. Hibernate는 5장의 매핑 정보(<code>@Table(name = &quot;board_tb&quot;)</code> 등)를 참고해서 JPQL을 H2에 맞는 SQL로 바꿔 실행합니다.</p>
+<p><strong>예제 6-1 — 글 목록을 조회하는 Repository 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 5-5</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/board/BoardRepository.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</div><pre><code class="language-java" data-code="package com.newtenco.blog.board;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface BoardRepository extends JpaRepository&lt;Board, Integer&gt; {
+
+    @Query(&quot;select b from Board b join fetch b.user order by b.id desc&quot;)
+    List&lt;Board&gt; findAllJoinUser();
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>board</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>data<span class="token punctuation">.</span>jpa<span class="token punctuation">.</span>repository<span class="token punctuation">.</span></span><span class="token class-name">JpaRepository</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>data<span class="token punctuation">.</span>jpa<span class="token punctuation">.</span>repository<span class="token punctuation">.</span></span><span class="token class-name">Query</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">List</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">BoardRepository</span> <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Board</span><span class="token punctuation">,</span> <span class="token class-name">Integer</span><span class="token punctuation">></span></span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Query</span><span class="token punctuation">(</span><span class="token string">"select b from Board b join fetch b.user order by b.id desc"</span><span class="token punctuation">)</span>
+    <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Board</span><span class="token punctuation">></span></span> <span class="token function">findAllJoinUser</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>select b from Board b</code>는 <code>Board</code> 엔티티를 별칭 <code>b</code>로 모두 가져오라는 뜻입니다. <code>order by b.id desc</code>는 id가 큰 글, 곧 나중에 쓴 글을 앞에 둡니다. 가운데 있는 <code>join fetch b.user</code>가 이 쿼리의 핵심입니다. 다음 항에서 설명합니다.</p>
+<p>아직 이 메서드를 호출하는 코드가 없습니다. 그래서 서버를 띄워도 달라지는 것은 없습니다.</p>
+<h4>2.3 join fetch와 N+1 문제</h4>
+<p>5장에서 <code>Board</code>의 <code>user</code> 필드는 지연 로딩(LAZY)으로 매핑했습니다. 글을 조회하면 <code>user</code> 필드에는 실제 작성자 대신 프록시가 들어 있습니다. <code>getUser().getUsername()</code>처럼 작성자 값을 처음 꺼낼 때 비로소 <code>user_tb</code>를 조회합니다.</p>
+<p>글 목록에는 작성자 이름도 보여 주어야 합니다. <code>join fetch</code> 없이 <code>findAll()</code>로 글을 가져와 작성자 이름을 꺼내면 쿼리가 몇 번 실행되는지 봅시다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-java" data-code="public List&lt;BoardResponse.ListDTO&gt; 글목록() {
+    return boardRepository.findAll().stream()
+            .map(BoardResponse.ListDTO::new)
+            .toList();
+}"><span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token punctuation">></span></span> 글목록<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> boardRepository<span class="token punctuation">.</span><span class="token function">findAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">stream</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token operator">::</span><span class="token keyword">new</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">toList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>글 목록을 가져오는 <code>select</code>가 먼저 한 번 실행됩니다. 그다음 DTO를 만들면서 작성자 이름을 꺼낼 때마다 <code>user_tb</code>를 조회하는 <code>select</code>가 따로 실행됩니다. 목록 쿼리 1번에 작성자 쿼리 N번이 더 붙는다고 해서 이 현상을 <strong>N+1 문제</strong>라고 부릅니다.</p>
+<p>여기서 N은 글 수가 아니라 서로 다른 작성자 수입니다. 한 번 불러온 작성자는 영속성 컨텍스트에 남아 있어서 다시 조회하지 않기 때문입니다. 샘플 데이터는 작성자가 <code>ssar</code>, <code>cos</code> 둘이라 쿼리가 1 + 2 = 3번 실행됩니다. 글 100개를 작성자 100명이 썼다면 101번이 됩니다.</p>
+<p><strong>join fetch</strong>는 이 문제를 쿼리 한 번으로 해결합니다. <code>join fetch b.user</code>라고 쓰면 Hibernate가 <code>board_tb</code>와 <code>user_tb</code>를 SQL <code>join</code>으로 함께 조회합니다. 그리고 가져온 작성자를 각 <code>Board</code>의 <code>user</code>에 채워 둡니다. 작성자가 이미 채워져 있으니 이름을 꺼내도 추가 쿼리가 나가지 않습니다.</p>
+<table><thead><tr><th>조회 방법</th><th>실행되는 쿼리</th><th>샘플 데이터 기준</th></tr></thead><tbody><tr><td><code>findAll()</code> + 지연 로딩</td><td>글 1번 + 작성자 N번</td><td>3번</td></tr><tr><td><code>join fetch</code></td><td>글과 작성자를 <code>join</code>으로 1번</td><td>1번</td></tr></tbody></table>
+<p>즉시 로딩(EAGER)으로 바꿔도 N+1 문제는 사라지지 않습니다. JPQL로 글을 조회하면 Hibernate는 먼저 쿼리대로 글만 가져옵니다. 그 뒤에 즉시 로딩 설정을 보고 작성자를 따로 조회합니다. 그래서 이 책은 연관 엔티티를 지연 로딩으로 두고, 연관 엔티티가 함께 필요한 조회에서만 <code>join fetch</code>로 가져옵니다.</p>
+<h3>3. record와 응답 DTO</h3>
+<h4>3.1 엔티티를 그대로 내보내지 않는 이유</h4>
+<p>Controller가 <code>Board</code> 엔티티를 그대로 반환해도 Jackson은 JSON을 만들려고 합니다. 그래도 이 책은 엔티티를 응답으로 내보내지 않습니다.</p>
+<p>첫째, 내보내면 안 되는 값까지 나갑니다. <code>Board</code>의 <code>user</code> 필드에는 <code>User</code> 엔티티가 들어 있고, <code>User</code>에는 <code>password</code> 필드가 있습니다. 엔티티를 그대로 내보내면 비밀번호까지 JSON에 실립니다.</p>
+<p>둘째, 지연 로딩 프록시가 문제를 일으킵니다. 작성자가 아직 프록시인 채로 Jackson이 JSON을 만들면 프록시의 내부 필드까지 변환하려다 오류가 납니다. 트랜잭션 밖에서 지연 로딩을 시도하다 실패하기도 합니다.</p>
+<p>셋째, 테이블 구조와 API 응답이 묶입니다. 엔티티에 필드 하나를 더하면 API 응답 모양도 함께 바뀝니다. 그러면 이 API를 쓰는 화면 쪽 코드가 예고 없이 깨질 수 있습니다.</p>
+<p>그래서 응답에 필요한 값만 담는 객체를 따로 만듭니다. 계층 사이에서 데이터를 옮기려고 만드는 객체를 <strong>DTO(Data Transfer Object)</strong>라고 합니다.</p>
+<h4>3.2 record로 응답 DTO 만들기</h4>
+<p>이 책은 DTO를 <strong>record</strong>로 만듭니다. record는 Java 16부터 쓸 수 있는 클래스 형태입니다. 구성 요소만 선언하면 필드 · 생성자 · 접근 메서드가 생깁니다. 필드 값을 바꿀 수 없어서 응답 데이터를 담기에 알맞습니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2</div><pre><code class="language-java" data-code="public record 레코드명(타입 구성요소명, 타입 구성요소명) {
+}"><span class="token keyword">public</span> <span class="token keyword">record</span> 레코드명<span class="token punctuation">(</span>타입 구성요소명<span class="token punctuation">,</span> 타입 구성요소명<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>record 한 줄을 쓰면 컴파일러가 다음 코드 조각의 주석에 적은 코드를 만들어 넣습니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</div><pre><code class="language-java" data-code="public record SampleDTO(Integer id, String title) {}
+
+// 컴파일러가 만들어 주는 것
+// private final Integer id;  private final String title;      값을 바꿀 수 없는 필드
+// public SampleDTO(Integer id, String title) { ... }           정식 생성자
+// public Integer id() { ... }  public String title() { ... }   접근 메서드
+// equals() · hashCode() · toString()                           구성 요소 값으로 비교하고 출력"><span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">SampleDTO</span><span class="token punctuation">(</span><span class="token class-name">Integer</span> id<span class="token punctuation">,</span> <span class="token class-name">String</span> title<span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+<span class="token comment">// 컴파일러가 만들어 주는 것</span>
+<span class="token comment">// private final Integer id;  private final String title;      값을 바꿀 수 없는 필드</span>
+<span class="token comment">// public SampleDTO(Integer id, String title) { ... }           정식 생성자</span>
+<span class="token comment">// public Integer id() { ... }  public String title() { ... }   접근 메서드</span>
+<span class="token comment">// equals() · hashCode() · toString()                           구성 요소 값으로 비교하고 출력</span></code></pre></div></div>
+<p>접근 메서드 이름에는 <code>get</code>이 붙지 않습니다. Lombok의 <code>@Getter</code>를 붙인 엔티티는 <code>board.getTitle()</code>로 값을 꺼내고, record는 <code>dto.title()</code>로 꺼냅니다. <code>toString()</code>은 <code>SampleDTO[id=1, title=제목1]</code>처럼 구성 요소를 모두 보여 주므로 로그로 값을 확인하기 편합니다. <code>equals()</code>는 구성 요소 값이 모두 같으면 <code>true</code>를 돌려줍니다.</p>
+<p>Jackson은 record의 구성 요소 이름을 그대로 JSON 키로 씁니다. <code>title</code> 구성 요소는 <code>&quot;title&quot;</code> 키가 됩니다. 요청 JSON을 record로 받는 방법은 10장에서 다룹니다.</p>
+<h4>3.3 엔티티를 받는 보조 생성자</h4>
+<p>record의 정식 생성자는 모든 구성 요소를 순서대로 받습니다. 엔티티에서 값을 하나씩 꺼내 정식 생성자에 넘기는 코드를 DTO가 필요한 곳마다 쓰면 번거롭습니다. 그래서 엔티티 하나를 받는 보조 생성자를 record 안에 둡니다. record의 보조 생성자는 반드시 <code>this(...)</code>로 정식 생성자를 호출해야 합니다.</p>
+<p><strong>예제 6-2 — 글 목록 응답 DTO 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 6-1</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/board/BoardResponse.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</div><pre><code class="language-java" data-code="package com.newtenco.blog.board;
+
+import java.sql.Timestamp;
+
+public class BoardResponse {
+
+    public record ListDTO(Integer id, String title, String content, String username, Timestamp createdAt) {
+
+        public ListDTO(Board board) {
+            this(board.getId(), board.getTitle(), board.getContent(), board.getUser().getUsername(), board.getCreatedAt());
+        }
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>board</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>sql<span class="token punctuation">.</span></span><span class="token class-name">Timestamp</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BoardResponse</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">ListDTO</span><span class="token punctuation">(</span><span class="token class-name">Integer</span> id<span class="token punctuation">,</span> <span class="token class-name">String</span> title<span class="token punctuation">,</span> <span class="token class-name">String</span> content<span class="token punctuation">,</span> <span class="token class-name">String</span> username<span class="token punctuation">,</span> <span class="token class-name">Timestamp</span> createdAt<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token class-name">ListDTO</span><span class="token punctuation">(</span><span class="token class-name">Board</span> board<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">(</span>board<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> board<span class="token punctuation">.</span><span class="token function">getTitle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> board<span class="token punctuation">.</span><span class="token function">getContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> board<span class="token punctuation">.</span><span class="token function">getUser</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> board<span class="token punctuation">.</span><span class="token function">getCreatedAt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>ListDTO</code>에는 <code>User</code> 객체 대신 작성자 이름 <code>username</code> 하나만 담습니다. 비밀번호와 이메일이 들어갈 자리는 아예 없습니다.</p>
+<p><code>BoardResponse</code>는 글 응답 DTO를 모아 두는 바깥 클래스입니다. 7장에서 상세 응답 DTO가 생기면 이 클래스 안에 record를 하나 더 추가합니다. 쓰는 쪽에서는 <code>BoardResponse.ListDTO</code>처럼 바깥 클래스 이름과 함께 씁니다. 그래서 이름만 보고도 어떤 기능의 어떤 응답인지 알 수 있습니다.</p>
+<p>보조 생성자 안의 <code>board.getUser().getUsername()</code>은 작성자 이름을 꺼냅니다. 작성자가 <code>join fetch</code>로 채워져 있으면 추가 쿼리가 나가지 않습니다. 프록시 상태라면 이 줄에서 작성자 조회 쿼리가 실행됩니다.</p>
+<h3>4. Service와 트랜잭션</h3>
+<h4>4.1 @Service와 @Transactional(readOnly = true)</h4>
+<p><strong>@Service</strong>는 업무 로직을 맡는 클래스라고 표시하는 애너테이션입니다. <code>@Component</code>처럼 컴포넌트 스캔 대상이라서, 붙여 두면 스프링이 빈으로 등록합니다. 그래서 Controller가 생성자로 주입받을 수 있습니다.</p>
+<p><strong>트랜잭션(transaction)</strong>은 데이터베이스 작업을 하나로 묶는 단위입니다. 묶인 작업은 모두 반영되거나 모두 취소됩니다. <strong>@Transactional</strong>을 붙인 메서드는 시작할 때 트랜잭션이 열리고 끝날 때 닫힙니다. 클래스에 붙이면 그 클래스의 메서드 전체에 적용됩니다. <code>public</code> 메서드뿐 아니라 <code>protected</code> 메서드와 패키지 전용 메서드에도 적용됩니다. 다만 <code>private</code> 메서드에는 적용되지 않습니다.</p>
+<p>5장에서 open-in-view를 껐으므로, 이 책의 설정에서는 영속성 컨텍스트가 트랜잭션이 열려 있는 동안만 살아 있습니다. 지연 로딩도 이 안에서만 할 수 있습니다. 이 설정에 따른 차이는 4.2에서 자세히 봅니다. 그래서 엔티티를 DTO로 바꾸는 일은 트랜잭션이 열린 Service 메서드 안에서 끝냅니다.</p>
+<p><code>readOnly = true</code>는 이 트랜잭션에서 조회만 한다고 알리는 설정입니다. Hibernate는 조회한 엔티티의 처음 모습을 보관해 둡니다. 트랜잭션이 끝날 때 바뀐 곳을 찾아 <code>update</code>를 실행하기 위해서입니다. 읽기 전용이면 처음 모습을 보관하지도, 바뀐 곳을 찾지도 않으므로 메모리와 시간을 아낍니다.</p>
+<p>이 장의 Service에는 조회 메서드만 있으므로 클래스 전체를 읽기 전용으로 둡니다. 데이터를 바꾸는 메서드에서 이 설정을 덮어쓰는 방법은 10장에서 다룹니다.</p>
+<p><strong>예제 6-3 — 글 목록 Service 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 6-2</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/board/BoardService.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</div><pre><code class="language-java" data-code="package com.newtenco.blog.board;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class BoardService {
+
+    private final BoardRepository boardRepository;
+
+    public List&lt;BoardResponse.ListDTO&gt; 글목록() {
+        return boardRepository.findAllJoinUser().stream()
+                .map(BoardResponse.ListDTO::new)
+                .toList();
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>board</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>transaction<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Transactional</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">List</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@Transactional</span><span class="token punctuation">(</span>readOnly <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BoardService</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">BoardRepository</span> boardRepository<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token punctuation">></span></span> 글목록<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> boardRepository<span class="token punctuation">.</span><span class="token function">findAllJoinUser</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">stream</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token operator">::</span><span class="token keyword">new</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">toList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>BoardResponse.ListDTO::new</code>는 <code>BoardResponse.ListDTO</code>에 만들어 둔 보조 생성자(예제 6-2), 곧 <code>Board</code> 하나를 받는 생성자를 가리키는 메서드 참조입니다. 스트림의 <code>Board</code>가 하나씩 이 생성자에 들어가 <code>ListDTO</code>로 바뀝니다. Service가 DTO 목록을 반환하므로 Controller 쪽으로는 엔티티가 넘어가지 않습니다.</p>
+<p>메서드 이름 <code>글목록()</code>은 한글로 썼습니다. 자바는 식별자에 한글을 허용하므로 그대로 컴파일됩니다.</p>
+<h4>4.2 open-in-view를 끄면 생기는 일</h4>
+<p>5장의 JPA 설정에서 <code>spring.jpa.open-in-view=false</code>로 두었습니다. <strong>open-in-view</strong>는 영속성 컨텍스트를 언제까지 열어 둘지 정하는 설정입니다. Spring Boot의 기본값은 <code>true</code>입니다. <code>true</code>이면 요청이 들어올 때 영속성 컨텍스트를 열고 응답을 다 만들 때까지 유지합니다. 그래서 트랜잭션이 끝난 Controller에서도 지연 로딩을 할 수 있습니다.</p>
+<p>편리하지만 요청을 처리하는 내내 데이터베이스 연결을 붙잡고 있게 됩니다. 요청이 몰리면 커넥션 풀의 연결이 모자라 다른 요청이 기다립니다. <code>false</code>로 끄면 Service의 트랜잭션이 끝날 때 영속성 컨텍스트도 닫히고 연결이 바로 반납됩니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-4f7819132424"><div class="figure-scroll"><img src="../assets/img/200f0eed88038e6e.png" alt="open-in-view에 따라 달라지는 영속성 컨텍스트의 범위" data-raster="true"/></div><figcaption>open-in-view에 따라 달라지는 영속성 컨텍스트의 범위</figcaption></figure>
+<p>그림 6-2의 아래 줄처럼, open-in-view를 끄면 트랜잭션 밖에 있는 Controller는 지연 로딩을 할 수 없습니다. Service가 <code>findAll()</code>로 가져온 엔티티를 그대로 반환하고 Controller가 DTO로 바꾸게 하면 문제가 드러납니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</div><pre><code class="language-java" data-code="// BoardService
+public List&lt;Board&gt; 글목록() {
+    return boardRepository.findAll();
+}
+
+// BoardController
+@GetMapping(&quot;/api/boards&quot;)
+public List&lt;BoardResponse.ListDTO&gt; list() {
+    return boardService.글목록().stream()
+            .map(BoardResponse.ListDTO::new)
+            .toList();
+}"><span class="token comment">// BoardService</span>
+<span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Board</span><span class="token punctuation">></span></span> 글목록<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> boardRepository<span class="token punctuation">.</span><span class="token function">findAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// BoardController</span>
+<span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/api/boards"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token punctuation">></span></span> <span class="token function">list</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> boardService<span class="token punctuation">.</span>글목록<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">stream</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token operator">::</span><span class="token keyword">new</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">toList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>Controller에서 <code>board.getUser().getUsername()</code>이 실행되는 순간 작성자는 아직 프록시입니다. 그런데 영속성 컨텍스트는 이미 닫혀 있습니다. Hibernate는 작성자를 조회하지 못하고 <code>LazyInitializationException</code>을 던집니다. 로그에는 다음과 비슷한 메시지가 남습니다.</p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code data-code="org.hibernate.LazyInitializationException: Could not initialize proxy [com.newtenco.blog.user.User#1] - no session">org.hibernate.LazyInitializationException: Could not initialize proxy [com.newtenco.blog.user.User#1] - no session</code></pre></div></div>
+<p><code>User#1</code>은 id가 1인 <code>User</code> 엔티티라는 뜻입니다. 이 예제에서는 <code>findAll()</code>이 1번 글부터 가져오고, 1번 글의 작성자가 1번 회원 <code>ssar</code>입니다. 그래서 첫 번째 DTO를 만들 때 바로 오류가 납니다.</p>
+<p>메시지 끝의 <code>no session</code>은 지연 로딩에 쓸 영속성 컨텍스트가 없다는 뜻입니다. Hibernate에서는 영속성 컨텍스트를 가지고 데이터베이스 작업을 하는 객체를 세션(Session)이라고 부릅니다. 세션이 닫히면 영속성 컨텍스트도 함께 닫힙니다.</p>
+<p>이 오류를 피하려고 이 책은 두 가지를 지킵니다. 필요한 연관 엔티티는 <code>join fetch</code>로 미리 채워 둡니다. 그리고 엔티티를 DTO로 바꾸는 일은 트랜잭션 안인 Service에서 끝냅니다. open-in-view를 켜 두면 이런 실수가 오류 없이 지나갔다가 나중에 N+1 문제나 연결 부족으로 드러납니다. 꺼 두면 개발 중에 바로 오류가 나므로 그 자리에서 고칠 수 있습니다.</p>
+<h3>5. Controller</h3>
+<h4>5.1 @RestController와 @GetMapping</h4>
+<p><strong>@RestController</strong>는 HTTP 요청을 받는 클래스라고 표시하는 애너테이션입니다. 이 애너테이션이 붙은 클래스는 빈으로 등록됩니다. 메서드가 반환한 객체는 Jackson이 JSON으로 바꿔 응답 본문에 씁니다. HTML 화면을 찾아 돌려주는 <code>@Controller</code>와 달리 반환값 자체가 응답 데이터가 됩니다.</p>
+<p><strong>@GetMapping</strong>은 메서드가 처리할 <code>GET</code> 요청의 주소를 정합니다. <code>POST</code>, <code>PUT</code>, <code>DELETE</code>에도 같은 모양의 애너테이션(<code>@PostMapping</code> 등)이 있으며, 뒤 장에서 하나씩 씁니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</div><pre><code class="language-java" data-code="@RestController
+public class 컨트롤러명 {
+
+    @GetMapping(&quot;주소&quot;)
+    public 반환타입 메서드명() {
+        return 응답데이터;
+    }
+}"><span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> 컨트롤러명 <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"주소"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> 반환타입 메서드명<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> 응답데이터<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<h4>5.2 글 목록 API 확인</h4>
+<p>Controller까지 만들면 요청이 세 계층을 모두 거치는 글 목록 API가 완성됩니다.</p>
+<p><strong>예제 6-4 — 글 목록 API 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 6-3</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/board/BoardController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</div><pre><code class="language-java" data-code="package com.newtenco.blog.board;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@RestController
+public class BoardController {
+
+    private final BoardService boardService;
+
+    @GetMapping(&quot;/api/boards&quot;)
+    public List&lt;BoardResponse.ListDTO&gt; list() {
+        return boardService.글목록();
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>board</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">GetMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">java<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">List</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BoardController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">BoardService</span> boardService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/api/boards"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">BoardResponse<span class="token punctuation">.</span>ListDTO</span><span class="token punctuation">></span></span> <span class="token function">list</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> boardService<span class="token punctuation">.</span>글목록<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>PowerShell에서 <code>.\gradlew.bat bootRun</code>으로 서버를 띄웁니다. Postman에서 <code>GET</code> <code>http://localhost:8080/api/boards</code>로 요청을 보내면 응답 본문에 다음 JSON이 표시됩니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</div><pre><code class="language-json" data-code="[
+  { &quot;id&quot;: 5, &quot;title&quot;: &quot;제목5&quot;, &quot;content&quot;: &quot;내용5&quot;, &quot;username&quot;: &quot;cos&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+  { &quot;id&quot;: 4, &quot;title&quot;: &quot;제목4&quot;, &quot;content&quot;: &quot;내용4&quot;, &quot;username&quot;: &quot;cos&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+  { &quot;id&quot;: 3, &quot;title&quot;: &quot;제목3&quot;, &quot;content&quot;: &quot;내용3&quot;, &quot;username&quot;: &quot;ssar&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+  { &quot;id&quot;: 2, &quot;title&quot;: &quot;제목2&quot;, &quot;content&quot;: &quot;내용2&quot;, &quot;username&quot;: &quot;ssar&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+  { &quot;id&quot;: 1, &quot;title&quot;: &quot;제목1&quot;, &quot;content&quot;: &quot;내용1&quot;, &quot;username&quot;: &quot;ssar&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; }
+]"><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목5"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용5"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"cos"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목4"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용4"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"cos"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목3"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용3"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목2"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용2"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목1"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용1"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span>
+<span class="token punctuation">]</span></code></pre></div></div>
+<p><code>createdAt</code>은 <code>data.sql</code>의 <code>now()</code>가 실행된 시각이라 실행할 때마다 다릅니다. Jackson 3은 <code>Timestamp</code>를 ISO-8601 형식의 UTC 시각으로 바꾸고, 끝에 UTC를 뜻하는 <code>Z</code>를 붙입니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-205c31bed884"><div class="figure-scroll"><img src="../assets/img/9811785f426eacaa.png" alt="Postman에서 GET http://localhost:8080/api/boards를 보낸 화면" data-raster="true"/></div><figcaption>Postman에서 GET http://localhost:8080/api/boards를 보낸 화면</figcaption><p class="credit">생성형 예시 · 실제 실행 안 함</p></figure>
+<p>같은 요청을 보낼 때 IntelliJ 콘솔에 출력되는 SQL도 확인합니다. 5장에서 <code>show-sql</code>과 <code>format_sql</code>을 켜 두었기 때문에 Hibernate가 실행한 쿼리가 줄을 맞춰 출력됩니다.</p>
+<div class="code-wrap" data-kind="output" data-lang="text"><div class="code-label"><span class="code-label__name">출력</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</div><pre><code data-code="Hibernate: 
+    select
+        b1_0.id,
+        b1_0.content,
+        b1_0.created_at,
+        b1_0.title,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.username 
+    from
+        board_tb b1_0 
+    join
+        user_tb u1_0 
+            on u1_0.id=b1_0.user_id 
+    order by
+        b1_0.id desc">Hibernate: 
+    select
+        b1_0.id,
+        b1_0.content,
+        b1_0.created_at,
+        b1_0.title,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.username 
+    from
+        board_tb b1_0 
+    join
+        user_tb u1_0 
+            on u1_0.id=b1_0.user_id 
+    order by
+        b1_0.id desc</code></pre></div></div>
+<p>요청 한 번에 <code>select</code>가 한 번만 실행되었고, <code>join</code>으로 <code>user_tb</code>를 함께 읽었습니다. <code>join fetch</code>가 N+1 문제를 막았다는 것을 로그로 확인할 수 있습니다. 쿼리는 <code>password</code>까지 조회했지만 응답 JSON에는 <code>ListDTO</code>에 담은 값만 나갔습니다.</p>
+<h3>6. 공통 응답 Resp</h3>
+<h4>6.1 응답 모양 통일하기(status · msg · body)</h4>
+<p>예제 6-4의 응답은 JSON 배열 하나입니다. 7장에서 글 상세 조회를 만들면 응답은 객체 하나가 되고, 실패하면 또 다른 모양의 오류 정보가 나갑니다. API마다 응답 모양이 다르면 화면 쪽 코드도 API마다 처리 방법을 따로 짜야 합니다.</p>
+<p>그래서 모든 응답을 같은 바깥 틀로 감쌉니다. 상태 코드 <code>status</code>, 안내 메시지 <code>msg</code>, 실제 데이터 <code>body</code> 세 칸을 늘 두고, API마다 달라지는 데이터는 <code>body</code>에만 담습니다. 이 틀을 record <code>Resp</code>로 만듭니다.</p>
+<table><thead><tr><th>칸</th><th>담는 값</th><th>글 목록 API의 값</th></tr></thead><tbody><tr><td><code>status</code></td><td>상태 코드</td><td><code>200</code></td></tr><tr><td><code>msg</code></td><td>안내 메시지</td><td><code>&quot;성공&quot;</code></td></tr><tr><td><code>body</code></td><td>실제 데이터</td><td>글 목록 배열</td></tr></tbody></table>
+<p><strong>예제 6-5 — 공통 응답으로 글 목록 감싸기</strong></p>
+<p><strong>이어서:</strong> 예제 6-4</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/util/Resp.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.util;
+
+import org.springframework.http.ResponseEntity;
+
+public record Resp&lt;T&gt;(Integer status, String msg, T body) {
+
+    public static &lt;B&gt; ResponseEntity&lt;Resp&lt;B&gt;&gt; ok(B body) {
+        return ResponseEntity.ok(new Resp&lt;&gt;(200, &quot;성공&quot;, body));
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">Resp</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">T</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token class-name">Integer</span> status<span class="token punctuation">,</span> <span class="token class-name">String</span> msg<span class="token punctuation">,</span> <span class="token class-name">T</span> body<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">B</span><span class="token punctuation">></span></span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Resp</span><span class="token punctuation">&lt;</span><span class="token class-name">B</span><span class="token punctuation">></span><span class="token punctuation">></span></span> <span class="token function">ok</span><span class="token punctuation">(</span><span class="token class-name">B</span> body<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">ResponseEntity</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Resp</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token number">200</span><span class="token punctuation">,</span> <span class="token string">"성공"</span><span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/board/BoardController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</div><pre><code class="language-java" data-code="package com.newtenco.blog.board;
+
+import com.newtenco.blog.core.util.Resp;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class BoardController {
+
+    private final BoardService boardService;
+
+    @GetMapping(&quot;/api/boards&quot;)
+    public ResponseEntity&lt;?&gt; list() {
+        return Resp.ok(boardService.글목록());
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>board</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">GetMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BoardController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">BoardService</span> boardService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/api/boards"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">list</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>boardService<span class="token punctuation">.</span>글목록<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>Build &gt; Build Project(Ctrl + F9)로 다시 컴파일하면 devtools가 서버를 다시 시작합니다. 그 뒤 Postman에서 같은 요청을 보내면 응답이 다음 모양으로 바뀝니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 200,
+  &quot;msg&quot;: &quot;성공&quot;,
+  &quot;body&quot;: [
+    { &quot;id&quot;: 5, &quot;title&quot;: &quot;제목5&quot;, &quot;content&quot;: &quot;내용5&quot;, &quot;username&quot;: &quot;cos&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+    { &quot;id&quot;: 4, &quot;title&quot;: &quot;제목4&quot;, &quot;content&quot;: &quot;내용4&quot;, &quot;username&quot;: &quot;cos&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+    { &quot;id&quot;: 3, &quot;title&quot;: &quot;제목3&quot;, &quot;content&quot;: &quot;내용3&quot;, &quot;username&quot;: &quot;ssar&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+    { &quot;id&quot;: 2, &quot;title&quot;: &quot;제목2&quot;, &quot;content&quot;: &quot;내용2&quot;, &quot;username&quot;: &quot;ssar&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; },
+    { &quot;id&quot;: 1, &quot;title&quot;: &quot;제목1&quot;, &quot;content&quot;: &quot;내용1&quot;, &quot;username&quot;: &quot;ssar&quot;, &quot;createdAt&quot;: &quot;2026-11-20T01:30:15.123Z&quot; }
+  ]
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"성공"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목5"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용5"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"cos"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목4"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용4"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"cos"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목3"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용3"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목2"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용2"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목1"</span><span class="token punctuation">,</span> <span class="token property">"content"</span><span class="token operator">:</span> <span class="token string">"내용1"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span> <span class="token property">"createdAt"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:30:15.123Z"</span> <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>예제 6-4의 배열이 그대로 <code>body</code> 안으로 들어갔습니다. <code>Resp</code>는 글 기능과 상관없이 모든 기능이 함께 쓰므로 <code>core.util</code> 패키지에 둡니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-cb13ec607474"><div class="figure-scroll"><img src="../assets/img/2e53351524f28380.png" alt="Postman에서 GET http://localhost:8080/api/boards를 다시 보낸 화면" data-raster="true"/></div><figcaption>Postman에서 GET http://localhost:8080/api/boards를 다시 보낸 화면</figcaption><p class="credit">생성형 예시 · 실제 실행 안 함</p></figure>
+<h4>6.2 ResponseEntity와 제네릭 정적 메서드</h4>
+<p><strong>ResponseEntity</strong>는 HTTP 응답 전체를 나타내는 스프링 클래스입니다. 응답 본문만 담는 일반 객체와 달리 상태 코드와 헤더까지 함께 담습니다. Controller가 <code>ResponseEntity</code>를 반환하면 스프링은 그 안의 상태 코드로 응답을 보내고, 본문은 Jackson이 JSON으로 바꿉니다.</p>
+<p><code>ResponseEntity.ok(본문)</code>은 상태 코드 200(OK)으로 응답을 만드는 정적 메서드입니다. 지금은 성공 응답만 있지만, 7장에서 404 같은 실패 응답을 보낼 때는 상태 코드를 직접 정해야 합니다. 그래서 처음부터 <code>ResponseEntity</code>로 반환해 둡니다.</p>
+<p>JSON 안의 <code>&quot;status&quot;: 200</code>과 HTTP 응답의 상태 코드 200은 따로 정해지는 값입니다. <code>Resp.ok()</code>가 두 값을 같게 맞춰 줍니다. 두 값이 어긋나면 기준은 HTTP 상태 코드입니다. 브라우저, Postman, 테스트 도구는 모두 HTTP 상태 코드로 성공과 실패를 판단하기 때문입니다. 본문의 <code>status</code>는 화면 코드가 본문만 보고도 결과를 알 수 있게 넣어 둔 복사본입니다. <code>Resp</code>의 정적 메서드를 거치지 않고 상태 코드를 직접 적는 곳(12장의 로그인 응답, 14장의 <code>RespFilter</code>)에서는 두 값을 같은 수로 맞춰야 합니다.</p>
+<p><code>Resp</code>의 <code>body</code>에는 글 목록도, 글 하나도, 회원 정보도 담겨야 합니다. 그래서 <code>body</code>의 타입을 타입 매개변수 <code>T</code>로 두었습니다. <code>Resp&lt;List&lt;BoardResponse.ListDTO&gt;&gt;</code>처럼 쓰면 <code>T</code>가 글 목록 타입으로 정해집니다.</p>
+<p>정적 메서드 <code>ok()</code>는 record의 <code>T</code>를 쓸 수 없습니다. <code>T</code>는 <code>Resp</code> 객체를 만들 때 정해지는데, 정적 메서드는 객체 없이 호출되기 때문입니다. 그래서 <code>ok()</code>는 자기만의 타입 매개변수를 따로 선언합니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3</div><pre><code class="language-java" data-code="public static &lt;타입매개변수&gt; 반환타입 메서드명(타입매개변수 매개변수명) {
+    return 값;
+}"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token operator">&lt;</span>타입매개변수<span class="token operator">></span> 반환타입 메서드명<span class="token punctuation">(</span>타입매개변수 매개변수명<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> 값<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>static</code> 뒤의 <code>&lt;B&gt;</code>가 <code>ok()</code>만의 타입 매개변수입니다. <code>Resp.ok(boardService.글목록())</code>처럼 호출하면 컴파일러가 넘긴 값을 보고 <code>B</code>를 <code>List&lt;BoardResponse.ListDTO&gt;</code>로 정합니다. 반환 타입도 <code>ResponseEntity&lt;Resp&lt;List&lt;BoardResponse.ListDTO&gt;&gt;&gt;</code>가 됩니다. 이름을 <code>T</code>가 아닌 <code>B</code>로 지은 것은 record의 <code>T</code>와 다른 타입 매개변수임을 드러내기 위해서입니다.</p>
+<p>Controller의 반환 타입은 <code>ResponseEntity&lt;?&gt;</code>로 썼습니다. <code>?</code>는 어떤 타입이든 받는다는 와일드카드입니다. 그래서 긴 제네릭 타입을 메서드마다 적지 않아도 됩니다. 7장부터는 성공과 실패처럼 본문 타입이 다른 응답을 한 메서드에서 돌려줄 때도 이 반환 타입을 그대로 씁니다.</p><nav class="chapter-nav"><button type="button" class="text" data-prev="true" data-href="05.html">← 이전 장</button><span>6 / 26</span><button type="button" class="text" data-next="true" data-href="07.html">다음 장 →</button></nav></section></main></div><script src="../assets/book-6d8228e561daa8ba.js"></script></body></html>

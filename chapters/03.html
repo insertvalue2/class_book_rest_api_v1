@@ -1,0 +1,162 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"><meta name="viewport" content="width=device-width,initial-scale=1"><title>스프링부트4로배우는 REST API </title><link rel="stylesheet" href="../assets/book-5206c2e7258828b8.css"></head><body><div class="reader" data-toc="open"><header class="book-bar"><button type="button" class="toc-toggle" aria-expanded="true" aria-controls="toc">목차</button><span class="book-bar__title">스프링부트4로배우는 REST API </span></header><aside class="toc" id="toc"><p class="caption">목차 / CONTENTS</p><div class="toc-title">스프링부트4로배우는 REST API </div><a href="../index.html" data-chapter="0" title="표지" aria-current="false">표지</a><a href="01.html" data-chapter="1" title="1장. Spring Boot 실행 환경" aria-current="false">1장. Spring Boot 실행 환경</a><a href="02.html" data-chapter="2" title="2장. 빈과 의존성 주입이란?" aria-current="false">2장. 빈과 의존성 주입이란?</a><a href="03.html" data-chapter="3" title="3장. REST API란?" aria-current="true">3장. REST API란?</a><a href="04.html" data-chapter="4" title="4장. 데이터베이스와 SQL이란?" aria-current="false">4장. 데이터베이스와 SQL이란?</a><a href="05.html" data-chapter="5" title="5장. JPA 엔티티란?" aria-current="false">5장. JPA 엔티티란?</a><a href="06.html" data-chapter="6" title="6장. REST API 계층 구조란?" aria-current="false">6장. REST API 계층 구조란?</a><a href="07.html" data-chapter="7" title="7장. 예외 처리란?" aria-current="false">7장. 예외 처리란?</a><a href="08.html" data-chapter="8" title="8장. 페이징이란?" aria-current="false">8장. 페이징이란?</a><a href="09.html" data-chapter="9" title="9장. Spring Security란?" aria-current="false">9장. Spring Security란?</a><a href="10.html" data-chapter="10" title="10장. 비밀번호 암호화란?" aria-current="false">10장. 비밀번호 암호화란?</a><a href="11.html" data-chapter="11" title="11장. 입력값 검증이란?" aria-current="false">11장. 입력값 검증이란?</a><a href="12.html" data-chapter="12" title="12장. JWT란?" aria-current="false">12장. JWT란?</a><a href="13.html" data-chapter="13" title="13장. CORS란?" aria-current="false">13장. CORS란?</a><a href="14.html" data-chapter="14" title="14장. 인증 필터란?" aria-current="false">14장. 인증 필터란?</a><a href="15.html" data-chapter="15" title="15장. 인가란?" aria-current="false">15장. 인가란?</a><a href="16.html" data-chapter="16" title="16장. 양방향 연관관계란?" aria-current="false">16장. 양방향 연관관계란?</a><a href="17.html" data-chapter="17" title="17장. 내 글 표시와 내 정보 수정" aria-current="false">17장. 내 글 표시와 내 정보 수정</a><a href="18.html" data-chapter="18" title="18장. 역할 기반 접근 제어란?" aria-current="false">18장. 역할 기반 접근 제어란?</a><a href="19.html" data-chapter="19" title="19장. 리프레시 토큰이란?" aria-current="false">19장. 리프레시 토큰이란?</a><a href="20.html" data-chapter="20" title="20장. 블로그 API 완성 점검" aria-current="false">20장. 블로그 API 완성 점검</a><a href="21.html" data-chapter="21" title="21장. 프로필이란?" aria-current="false">21장. 프로필이란?</a><a href="22.html" data-chapter="22" title="22장. 환경 변수란?" aria-current="false">22장. 환경 변수란?</a><a href="23.html" data-chapter="23" title="23장. 파일 업로드란?" aria-current="false">23장. 파일 업로드란?</a><a href="24.html" data-chapter="24" title="24장. API 문서란?" aria-current="false">24장. API 문서란?</a><a href="25.html" data-chapter="25" title="25장. 단위 테스트란?" aria-current="false">25장. 단위 테스트란?</a><a href="26.html" data-chapter="26" title="26장. 통합 테스트란?" aria-current="false">26장. 통합 테스트란?</a><footer>26장</footer></aside><main class="reading"><section class="chapter" id="chapter-3"><div class="eyebrow">스프링부트4로배우는 REST API  / CHAPTER 03</div><span class="chapter-num" aria-hidden="true">03</span><h2>3장. REST API란?</h2><h3>1. HTTP의 개념</h3>
+<h4>1.1 요청과 응답</h4>
+<p><strong>HTTP(HyperText Transfer Protocol)</strong>는 클라이언트와 서버가 데이터를 주고받을 때 지키는 통신 규칙입니다. <strong>클라이언트(client)</strong>는 요청을 보내는 쪽이고, <strong>서버(server)</strong>는 요청을 받아 처리한 뒤 결과를 돌려주는 쪽입니다. 클라이언트가 보내는 메시지를 <strong>요청(request)</strong>, 서버가 돌려주는 메시지를 <strong>응답(response)</strong>이라고 합니다.</p>
+<p>이 책에서는 1장부터 만들어 온 Spring Boot 애플리케이션이 서버입니다. 클라이언트 자리는 이 장에서 설치할 Postman이 먼저 맡고, 후속 과정에서는 React로 만든 화면이 이어받습니다. 클라이언트가 바뀌어도 서버는 똑같은 HTTP 요청을 받고 똑같은 응답을 돌려줍니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-521e2fe3ea58"><div class="figure-scroll"><img src="../assets/img/2b5612ebd9bbba3c.png" alt="요청 하나에 응답 하나" data-raster="true"/></div><figcaption>요청 하나에 응답 하나</figcaption></figure>
+<p>그림 3-1처럼 서버는 먼저 말을 걸지 않습니다. 요청이 와야 일을 시작하고, 요청 하나에 응답 하나를 돌려줍니다.</p>
+<p>HTTP에는 기억해 둘 성질이 하나 있습니다. 서버는 앞 요청을 기억하지 않습니다. 방금 로그인한 사용자가 다음 요청을 보내도, 서버는 그 요청만 보고는 누가 보냈는지 알 수 없습니다. 그래서 요청마다 &quot;나는 누구다&quot;를 증명할 정보를 실어 보내야 합니다. 이 문제를 토큰으로 해결하는 방법은 12장에서 다룹니다.</p>
+<h4>1.2 요청 라인 · 헤더 · 본문</h4>
+<p>HTTP 메시지는 사람이 읽을 수 있는 텍스트입니다. 요청은 첫 줄인 <strong>요청 라인(request line)</strong>, 그 아래의 <strong>헤더(header)</strong>, 빈 줄 하나, 그리고 <strong>본문(body)</strong> 순서로 이루어집니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="http"><div class="code-label"><span class="code-label__name">HTTP</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code data-code="메서드 경로 HTTP버전
+헤더이름: 값
+헤더이름: 값
+
+본문">메서드 경로 HTTP버전
+헤더이름: 값
+헤더이름: 값
+
+본문</code></pre></div></div>
+<p>요청 라인에는 무엇을 할지(메서드), 어디에 할지(경로), 어떤 HTTP 버전을 쓰는지가 들어갑니다. 헤더는 요청에 덧붙이는 정보를 <code>이름: 값</code> 형태로 한 줄에 하나씩 적습니다. 본문은 서버에 보낼 데이터입니다. 헤더와 본문 사이의 빈 줄은 헤더가 끝났다는 표시라서 빠뜨리면 안 됩니다.</p>
+<p>회원가입 요청을 예로 들면 다음과 같습니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="http"><div class="code-label"><span class="code-label__name">HTTP</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6</div><pre><code data-code="POST /join HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Accept: */*
+
+{&quot;username&quot;: &quot;love&quot;, &quot;password&quot;: &quot;1234&quot;, &quot;email&quot;: &quot;love@nate.com&quot;}">POST /join HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Accept: */*
+
+{&quot;username&quot;: &quot;love&quot;, &quot;password&quot;: &quot;1234&quot;, &quot;email&quot;: &quot;love@nate.com&quot;}</code></pre></div></div>
+<p><code>Content-Type</code>은 본문이 어떤 형식인지 서버에 알려 줍니다. <code>application/json</code>이면 본문이 JSON이라는 뜻입니다. <code>Accept</code>는 클라이언트가 받고 싶은 응답 형식을 알려 줍니다. <code>*/*</code>는 아무 형식이나 받겠다는 뜻입니다. 글 목록 조회처럼 서버에 보낼 데이터가 없는 요청은 빈 줄 뒤의 본문을 비워 둡니다.</p>
+<p>응답도 모양이 비슷합니다. 첫 줄이 <strong>상태 라인(status line)</strong>이라는 점만 다릅니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="http"><div class="code-label"><span class="code-label__name">HTTP</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4</div><pre><code data-code="HTTP버전 상태코드 상태문구
+헤더이름: 값
+
+본문">HTTP버전 상태코드 상태문구
+헤더이름: 값
+
+본문</code></pre></div></div>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="http"><div class="code-label"><span class="code-label__name">HTTP</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4</div><pre><code data-code="HTTP/1.1 200 OK
+Content-Type: application/json
+
+{&quot;status&quot;: 200, &quot;msg&quot;: &quot;성공&quot;, &quot;body&quot;: {&quot;id&quot;: 1, &quot;title&quot;: &quot;제목1&quot;, &quot;content&quot;: &quot;내용1&quot;, &quot;userId&quot;: 1, &quot;username&quot;: &quot;ssar&quot;}}">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{&quot;status&quot;: 200, &quot;msg&quot;: &quot;성공&quot;, &quot;body&quot;: {&quot;id&quot;: 1, &quot;title&quot;: &quot;제목1&quot;, &quot;content&quot;: &quot;내용1&quot;, &quot;userId&quot;: 1, &quot;username&quot;: &quot;ssar&quot;}}</code></pre></div></div>
+<p>상태 라인의 <code>200 OK</code>는 요청이 성공했다는 뜻입니다. 응답 헤더의 <code>Content-Type</code>은 이번에는 서버가 클라이언트에게 본문 형식을 알려 줍니다. 본문의 <code>status</code> · <code>msg</code> · <code>body</code> 세 칸은 이 책의 모든 API가 쓰는 공통 응답 모양이며, 6장에서 만듭니다.</p>
+<p>헤더는 앞으로 여러 번 다시 나옵니다. 로그인한 사용자는 <code>Authorization</code> 헤더에 토큰을 담아 보내고(12장), React 화면이 응답에 담긴 이 헤더를 읽으려면 CORS 설정이 필요합니다(13장). 지금은 요청 라인 · 헤더 · 본문의 위치만 구분하면 됩니다.</p>
+<h4>1.3 상태 코드(200 · 400 · 401 · 403 · 404 · 500)</h4>
+<p><strong>상태 코드(status code)</strong>는 서버가 요청을 어떻게 처리했는지 알려 주는 세 자리 숫자입니다. 클라이언트는 본문을 읽기 전에 이 숫자부터 보고 성공인지 실패인지 판단합니다. 종류는 첫 자리 숫자로 나뉩니다. 2로 시작하면 성공, 4로 시작하면 클라이언트가 요청을 잘못 보낸 경우, 5로 시작하면 서버 안에서 문제가 생긴 경우입니다.</p>
+<p>이 책에서 쓰는 상태 코드는 다음 여섯 개입니다.</p>
+<table><thead><tr><th>상태 코드</th><th>상태 문구</th><th>뜻</th><th>이 책에서 나오는 때</th><th>다루는 장</th></tr></thead><tbody><tr><td><code>200</code></td><td>OK</td><td>요청 성공</td><td>조회 · 가입 · 글쓰기 등이 성공했을 때</td><td>6장부터</td></tr><tr><td><code>400</code></td><td>Bad Request</td><td>요청 내용이 잘못됨</td><td>아이디가 너무 짧거나 이메일 형식이 틀렸을 때</td><td>11장</td></tr><tr><td><code>401</code></td><td>Unauthorized</td><td>인증 실패(누구인지 모름)</td><td>로그인 정보가 틀렸거나 토큰이 없을 때</td><td>12장 · 14장</td></tr><tr><td><code>403</code></td><td>Forbidden</td><td>권한 없음(누구인지는 알지만 허락 안 됨)</td><td>남의 글을 고치려 하거나 일반 회원이 관리자 주소를 부를 때</td><td>15장 · 18장</td></tr><tr><td><code>404</code></td><td>Not Found</td><td>자원이 없음</td><td>없는 글 번호나 없는 주소를 요청했을 때</td><td>7장</td></tr><tr><td><code>500</code></td><td>Internal Server Error</td><td>서버 내부 오류</td><td>서버 코드에서 예상하지 못한 예외가 났을 때</td><td>7장</td></tr></tbody></table>
+<p>입문자가 가장 많이 헷갈리는 것이 401과 403입니다. 401은 서버가 요청한 사람이 누구인지 모르는 상태입니다. 403은 누구인지는 알지만, 그 사람에게 허락되지 않은 일을 요청한 상태입니다. 건물에 비유하면 401은 출입증이 없어 입구에서 막힌 것이고, 403은 출입증은 있지만 들어갈 수 없는 방의 문 앞에서 막힌 것입니다.</p>
+<p>400 · 404와 500은 잘못이 어느 쪽에 있는지로 나뉩니다. 4로 시작하는 코드는 클라이언트가 요청을 고치면 해결되고, 500은 서버 코드를 고쳐야 해결됩니다. 그래서 없는 글을 요청했는데 500이 나가면 클라이언트는 자기 잘못인지 서버 고장인지 알 수 없습니다. 7장에서는 이런 경우를 404로 바로잡습니다.</p>
+<h3>2. REST API 설계 원칙</h3>
+<h4>2.1 자원과 URI</h4>
+<p><strong>API(Application Programming Interface)</strong>는 프로그램이 다른 프로그램의 기능을 쓰도록 열어 둔 창구입니다. 웹 서버의 API는 &quot;이 주소로 이 메서드를 보내면 이런 응답을 준다&quot;는 약속의 모음입니다. <strong>REST API</strong>는 이 약속을 정하는 대표적인 설계 방식입니다. 서버가 다루는 데이터를 <strong>자원(resource)</strong>으로 보고, 자원마다 주소를 붙여 HTTP로 주고받습니다.</p>
+<p>자원을 가리키는 주소를 <strong>URI(Uniform Resource Identifier)</strong>라고 합니다. 이 책의 블로그에서는 글 목록, 글 한 개, 댓글, 회원이 자원입니다.</p>
+<p>주소 하나는 다음 부분으로 나뉩니다.</p>
+<table><thead><tr><th>부분</th><th>예</th><th>뜻</th></tr></thead><tbody><tr><td>스킴</td><td><code>http</code></td><td>통신 규칙</td></tr><tr><td>호스트</td><td><code>localhost</code></td><td>서버가 있는 컴퓨터. <code>localhost</code>는 내 컴퓨터</td></tr><tr><td>포트</td><td><code>8080</code></td><td>그 컴퓨터에서 서버 프로그램이 요청을 기다리는 번호</td></tr><tr><td>경로</td><td><code>/api/boards/1</code></td><td>서버 안의 자원 위치</td></tr><tr><td>쿼리 스트링</td><td><code>?page=0&amp;keyword=스프링</code></td><td>조회 조건 등 덧붙이는 값</td></tr></tbody></table>
+<p>REST 방식에서는 경로를 정할 때 다음 규칙을 지킵니다.</p>
+<p>첫째, 경로에는 자원 이름인 명사만 쓰고 동사는 넣지 않습니다. <code>/getBoard</code>, <code>/deleteBoard</code>처럼 하는 일을 주소에 적지 않습니다. 하는 일은 다음 항에서 다룰 HTTP 메서드로 나타냅니다.</p>
+<p>둘째, 여러 개를 묶은 자원은 복수형으로 쓰고, 그중 하나는 뒤에 번호를 붙여 가리킵니다. <code>/api/boards</code>는 글 전체이고 <code>/api/boards/1</code>은 1번 글입니다. 경로 안의 이 번호를 <strong>경로 변수(path variable)</strong>라고 하며, 7장에서 <code>@PathVariable</code>로 꺼냅니다.</p>
+<p>셋째, 자원을 고르는 조건은 쿼리 스트링으로 붙입니다. 쿼리 스트링은 <code>?</code> 뒤에 <code>이름=값</code>을 <code>&amp;</code>로 이어 적습니다. <code>/api/boards?page=0&amp;keyword=스프링</code>은 &quot;글 목록 가운데 제목에 &#x27;스프링&#x27;이 들어간 글의 첫 쪽&quot;이라는 뜻입니다. 자원은 여전히 글 목록이고, 쿼리 스트링은 그 목록을 어떻게 보여 줄지만 정합니다. 이 값은 8장에서 <code>@RequestParam</code>으로 받습니다.</p>
+<h4>2.2 HTTP 메서드로 작업 나타내기</h4>
+<p><strong>HTTP 메서드(HTTP method)</strong>는 자원에 어떤 작업을 할지 나타내는 요청 라인의 첫 단어입니다. 같은 주소라도 메서드가 다르면 다른 작업이 됩니다. <code>/api/boards/1</code>에 <code>GET</code>을 보내면 1번 글을 조회하고, <code>DELETE</code>를 보내면 1번 글을 삭제합니다.</p>
+<table><thead><tr><th>HTTP 메서드</th><th>하는 일</th><th>본문</th><th>블로그 API 예</th></tr></thead><tbody><tr><td><code>GET</code></td><td>자원 조회</td><td>보내지 않음</td><td><code>GET /api/boards</code> 글 목록, <code>GET /api/boards/1</code> 1번 글</td></tr><tr><td><code>POST</code></td><td>자원 생성</td><td>만들 데이터</td><td><code>POST /api/boards</code> 글쓰기</td></tr><tr><td><code>PUT</code></td><td>자원 수정</td><td>바꿀 데이터</td><td><code>PUT /api/boards/1</code> 1번 글 수정</td></tr><tr><td><code>DELETE</code></td><td>자원 삭제</td><td>보내지 않음</td><td><code>DELETE /api/boards/1</code> 1번 글 삭제</td></tr></tbody></table>
+<p><code>GET</code>은 데이터를 읽기만 하고 서버의 데이터를 바꾸지 않습니다. 그래서 같은 <code>GET</code> 요청을 여러 번 보내도 서버의 데이터는 그대로입니다. 서버에 넘길 데이터가 없으니 본문도 쓰지 않습니다. 반대로 <code>POST</code>와 <code>PUT</code>은 서버에 데이터를 넘겨야 하므로 본문에 JSON을 담습니다.</p>
+<p><code>POST</code>와 <code>PUT</code>은 대상이 다릅니다. <code>POST</code>는 아직 번호가 없는 새 자원을 만들기 때문에 목록 주소 <code>/api/boards</code>로 보냅니다. 새 글 번호는 서버가 정합니다. <code>PUT</code>은 이미 있는 자원을 고치므로 <code>/api/boards/1</code>처럼 번호가 붙은 주소로 보냅니다.</p>
+<p>모든 작업이 자원 하나에 딱 맞아떨어지지는 않습니다. 로그인은 무언가를 조회하거나 만드는 일이라기보다 &quot;인증&quot;이라는 동작입니다. 이 책에서는 이런 주소에 <code>/login</code>처럼 동작 이름을 쓰고 <code>POST</code>로 보냅니다. 비밀번호 같은 값을 쿼리 스트링에 넣으면 주소에 그대로 드러나므로 본문에 담기 위해서입니다. 실무에서도 자원 규칙을 기본으로 지키되, 인증 같은 동작은 이렇게 예외로 두는 경우가 많습니다.</p>
+<h4>2.3 JSON 응답</h4>
+<p>REST API 서버는 화면(HTML)을 만들지 않고 데이터만 돌려줍니다. 화면은 데이터를 받은 클라이언트가 그립니다. 데이터 형식으로는 <strong>JSON(JavaScript Object Notation)</strong>을 가장 많이 씁니다. JSON은 이름과 값을 짝지어 적는 텍스트 형식입니다. 이름은 JavaScript에서 왔지만 자바를 비롯한 여러 언어에서 읽고 쓸 수 있습니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4</div><pre><code class="language-json" data-code="{
+  &quot;이름&quot;: 값,
+  &quot;이름&quot;: 값
+}"><span class="token punctuation">{</span>
+  <span class="token property">"이름"</span><span class="token operator">:</span> 값<span class="token punctuation">,</span>
+  <span class="token property">"이름"</span><span class="token operator">:</span> 값
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>{ }</code>로 감싼 것을 객체라고 하고, 그 안에 <code>&quot;이름&quot;: 값</code> 쌍을 쉼표로 나열합니다. 이름은 반드시 큰따옴표로 감쌉니다. 값으로 쓸 수 있는 형식은 다음과 같습니다.</p>
+<table><thead><tr><th>값 형식</th><th>예</th><th>자바에서 대응하는 값</th></tr></thead><tbody><tr><td>문자열</td><td><code>&quot;제목1&quot;</code></td><td><code>String</code></td></tr><tr><td>숫자</td><td><code>1</code>, <code>3.14</code></td><td><code>int</code> · <code>long</code> · <code>double</code> 등</td></tr><tr><td>불리언</td><td><code>true</code>, <code>false</code></td><td><code>boolean</code></td></tr><tr><td>null</td><td><code>null</code></td><td><code>null</code></td></tr><tr><td>객체</td><td><code>{ &quot;id&quot;: 1 }</code></td><td>객체(record 등)</td></tr><tr><td>배열</td><td><code>[1, 2, 3]</code></td><td><code>List</code> 등</td></tr></tbody></table>
+<p>객체 안에 객체나 배열을 넣을 수 있어서, 글 목록처럼 여러 건인 데이터도 JSON 하나로 표현합니다.</p>
+<p><strong>코드 조각</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4</div><pre><code class="language-json" data-code="[
+  { &quot;id&quot;: 2, &quot;title&quot;: &quot;제목2&quot;, &quot;username&quot;: &quot;ssar&quot; },
+  { &quot;id&quot;: 1, &quot;title&quot;: &quot;제목1&quot;, &quot;username&quot;: &quot;ssar&quot; }
+]"><span class="token punctuation">[</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목2"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">{</span> <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token property">"title"</span><span class="token operator">:</span> <span class="token string">"제목1"</span><span class="token punctuation">,</span> <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span> <span class="token punctuation">}</span>
+<span class="token punctuation">]</span></code></pre></div></div>
+<p>자바 객체를 이런 JSON 문자열로 바꾸는 코드는 개발자가 직접 쓰지 않습니다. Spring Boot의 웹 스타터에 들어 있는 JSON 라이브러리 <strong>Jackson(잭슨)</strong>이 그 일을 맡습니다. Controller가 객체를 반환하면 Jackson이 그 객체를 JSON으로 바꿔 응답 본문에 씁니다. 이때 응답의 <code>Content-Type</code>도 <code>application/json</code>으로 붙습니다. 요청 본문의 JSON을 자바 객체로 바꾸는 일도 Jackson이 합니다. Spring Boot 4는 Jackson 3을 쓰며, Jackson 3의 패키지 이름은 <code>tools.jackson</code>으로 시작합니다. 14장에서 Jackson 클래스를 직접 쓸 때 이 패키지 이름이 필요합니다.</p>
+<h3>3. API 테스트 도구 준비</h3>
+<h4>3.1 Postman으로 요청 보내기</h4>
+<p>API를 만들면 요청을 보내 응답을 확인해 봐야 합니다. 브라우저 주소창으로는 <code>GET</code> 요청밖에 보낼 수 없고, 헤더나 본문을 넣기도 어렵습니다. 그래서 <strong>Postman(포스트맨)</strong>을 씁니다. Postman은 메서드 · 주소 · 헤더 · 본문을 정해 요청을 보내고, 응답의 상태 코드 · 헤더 · 본문을 나누어 보여 주는 프로그램입니다.</p>
+<p>Postman 공식 사이트에서 데스크톱 앱을 내려받아 설치합니다. 요청을 저장해 두고 다시 쓰려면 왼쪽 Collections에서 <code>blog</code> 컬렉션을 하나 만듭니다. 앞으로 만드는 요청은 모두 이 컬렉션 안에 저장합니다.</p>
+<p>PowerShell에서 <code>.\gradlew.bat bootRun</code>으로 서버를 실행합니다. 그다음 Postman에서 새 요청을 만들고 다음 값으로 보냅니다.</p>
+<table><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td>메서드</td><td><code>GET</code></td></tr><tr><td>주소</td><td><code>http://localhost:8080/</code></td></tr></tbody></table>
+<p>주소 칸 왼쪽에서 메서드를 고르고, 주소를 입력한 뒤 Send를 누릅니다.</p>
+<p><strong>실행 결과</strong></p>
+<p>응답 영역 오른쪽 위에 상태 <code>404 Not Found</code>가 표시되고, Body 탭에 다음 JSON이 보입니다(<code>timestamp</code> 값은 보낸 시각에 따라 다르고, <code>trace</code>는 매우 길어서 줄여 보였습니다).</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</div><pre><code class="language-json" data-code="{
+    &quot;timestamp&quot;: &quot;2026-11-20T01:23:45.678Z&quot;,
+    &quot;status&quot;: 404,
+    &quot;error&quot;: &quot;Not Found&quot;,
+    &quot;trace&quot;: &quot;org.springframework.web.servlet.resource.NoResourceFoundException: No static resource  for request &#x27;/&#x27;.\r\n\tat ... (이하 생략)&quot;,
+    &quot;message&quot;: &quot;No static resource .&quot;,
+    &quot;path&quot;: &quot;/&quot;
+}"><span class="token punctuation">{</span>
+    <span class="token property">"timestamp"</span><span class="token operator">:</span> <span class="token string">"2026-11-20T01:23:45.678Z"</span><span class="token punctuation">,</span>
+    <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">404</span><span class="token punctuation">,</span>
+    <span class="token property">"error"</span><span class="token operator">:</span> <span class="token string">"Not Found"</span><span class="token punctuation">,</span>
+    <span class="token property">"trace"</span><span class="token operator">:</span> <span class="token string">"org.springframework.web.servlet.resource.NoResourceFoundException: No static resource  for request '/'.\r\n\tat ... (이하 생략)"</span><span class="token punctuation">,</span>
+    <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"No static resource ."</span><span class="token punctuation">,</span>
+    <span class="token property">"path"</span><span class="token operator">:</span> <span class="token string">"/"</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<figure class="book-figure blank" data-type="empty" id="figure-d9047ed82b86"><p class="blank__what">Postman에서 GET http://localhost:8080/을 보낸 직후 화면</p><p class="blank__why">아직 그림이 없습니다</p></figure>
+<p>아직 <code>/</code> 주소를 처리할 Controller가 없으니 404가 맞습니다. 서버가 요청을 받고 &quot;그런 자원은 없다&quot;고 상태 코드로 답한 것입니다. 응답 영역의 Headers 탭을 열면 <code>Content-Type</code>이 <code>application/json</code>인 것도 확인할 수 있습니다. <code>trace</code>와 <code>message</code>는 1장에서 넣은 devtools가 개발 중에만 덧붙이는 값입니다. 7장에서 다시 봅니다.</p>
+<p>같은 주소를 브라우저로 열면 JSON 대신 Whitelabel Error Page라는 HTML 화면이 나옵니다. Spring Boot가 요청의 <code>Accept</code> 헤더를 보고 오류 응답의 형식을 고르기 때문입니다. 브라우저는 <code>Accept</code> 헤더로 HTML을 받겠다고 알리고, Postman은 기본으로 <code>*/*</code>를 보내 아무 형식이나 받겠다고 알립니다. 1.2에서 본 <code>Accept</code> 헤더가 실제로 응답 형식을 바꾼 것입니다. 이 기본 오류 응답은 7장에서 이 책의 공통 응답 모양으로 바꿉니다.</p>
+<figure class="book-figure" data-type="generated" id="figure-e44df35c5921"><div class="figure-scroll"><img src="../assets/img/8a3432b66ee852a9.png" alt="같은 요청의 Postman 응답 영역에서 Headers 탭을 연 화면" data-raster="true"/></div><figcaption>같은 요청의 Postman 응답 영역에서 Headers 탭을 연 화면</figcaption><p class="credit">생성형 예시 · 실제 실행 안 함</p></figure>
+<p>앞으로 Postman에서 자주 쓸 곳은 다음과 같습니다.</p>
+<table><thead><tr><th>위치</th><th>쓰는 때</th></tr></thead><tbody><tr><td>Params 탭</td><td><code>?page=0</code>처럼 주소 뒤에 붙는 쿼리 스트링을 넣을 때</td></tr><tr><td>Headers 탭</td><td>로그인 뒤 받은 토큰을 <code>Authorization</code> 헤더에 넣을 때</td></tr><tr><td>Body 탭 → raw → JSON</td><td>회원가입 · 글쓰기처럼 JSON 본문을 보낼 때</td></tr><tr><td>응답의 Headers 탭</td><td>로그인 응답 헤더로 받은 토큰을 확인할 때</td></tr></tbody></table>
+<p>Body 탭에서 raw와 JSON을 고르면 Postman이 요청 헤더에 <code>Content-Type: application/json</code>을 알아서 넣어 줍니다. 이 헤더가 빠지면 서버는 본문을 JSON으로 읽지 않습니다.</p>
+<h4>3.2 완성할 블로그 API 한눈에 보기</h4>
+<p>이 책을 끝까지 따라 하면 다음 API가 완성됩니다. 접근 칸의 &quot;누구나&quot;는 로그인 없이, &quot;로그인&quot;은 로그인한 사용자만, &quot;작성자&quot;는 그 글이나 댓글을 쓴 사람만, &quot;ADMIN&quot;은 관리자만 호출할 수 있다는 뜻입니다.</p>
+<table><thead><tr><th>메서드</th><th>주소</th><th>하는 일</th><th>접근</th><th>만드는 장</th></tr></thead><tbody><tr><td><code>GET</code></td><td><code>/api/boards?page=0&amp;keyword=</code></td><td>글 목록(페이징 · 제목 검색)</td><td>누구나</td><td>6장 · 8장</td></tr><tr><td><code>GET</code></td><td><code>/api/boards/{id}</code></td><td>글 상세(댓글 포함)</td><td>누구나</td><td>7장 · 16장 · 17장</td></tr><tr><td><code>POST</code></td><td><code>/join</code></td><td>회원가입</td><td>누구나</td><td>10장</td></tr><tr><td><code>GET</code></td><td><code>/check-username?username=</code></td><td>아이디 중복 확인</td><td>누구나</td><td>11장</td></tr><tr><td><code>POST</code></td><td><code>/login</code></td><td>로그인(토큰 발급)</td><td>누구나</td><td>12장</td></tr><tr><td><code>GET</code></td><td><code>/api/users/me</code></td><td>내 정보</td><td>로그인</td><td>14장</td></tr><tr><td><code>POST</code></td><td><code>/api/boards</code></td><td>글쓰기</td><td>로그인</td><td>15장</td></tr><tr><td><code>PUT</code></td><td><code>/api/boards/{id}</code></td><td>글 수정</td><td>작성자</td><td>15장</td></tr><tr><td><code>DELETE</code></td><td><code>/api/boards/{id}</code></td><td>글 삭제</td><td>작성자</td><td>15장</td></tr><tr><td><code>POST</code></td><td><code>/api/replies</code></td><td>댓글 쓰기</td><td>로그인</td><td>16장</td></tr><tr><td><code>DELETE</code></td><td><code>/api/replies/{id}</code></td><td>댓글 삭제</td><td>작성자</td><td>16장</td></tr><tr><td><code>PUT</code></td><td><code>/api/users/me</code></td><td>내 정보 수정</td><td>로그인</td><td>17장</td></tr><tr><td><code>GET</code></td><td><code>/api/admin/hello</code></td><td>관리자 확인</td><td>ADMIN</td><td>18장</td></tr><tr><td><code>DELETE</code></td><td><code>/api/admin/boards/{id}</code></td><td>관리자 글 삭제</td><td>ADMIN</td><td>18장</td></tr><tr><td><code>PUT</code></td><td><code>/api/admin/users/{id}</code></td><td>회원 역할 바꾸기</td><td>ADMIN</td><td>18장</td></tr><tr><td><code>POST</code></td><td><code>/reissue</code></td><td>액세스 토큰 재발급</td><td>누구나(리프레시 토큰 필요)</td><td>19장</td></tr><tr><td><code>POST</code></td><td><code>/logout</code></td><td>로그아웃(리프레시 토큰 폐기)</td><td>누구나(리프레시 토큰 필요)</td><td>19장</td></tr></tbody></table>
+<p>표의 주소는 2절의 규칙을 따릅니다. 글은 <code>/api/boards</code>와 <code>/api/boards/{id}</code> 두 주소에 메서드만 바꿔 조회 · 생성 · 수정 · 삭제를 나타냅니다. <code>{id}</code> 자리에는 실제 요청에서 <code>1</code>처럼 글 번호가 들어갑니다.</p>
+<p>주소는 두 갈래로 나뉩니다. <code>/api</code>로 시작하는 주소는 게시글 · 댓글 · 회원 정보처럼 블로그의 데이터를 다룹니다. <code>/join</code> · <code>/login</code> · <code>/reissue</code>처럼 <code>/api</code>가 없는 주소는 회원가입과 인증을 맡습니다. 이렇게 나눠 두면 14장에서 &quot;<code>/api</code> 아래는 로그인해야 한다&quot; 같은 접근 규칙을 주소 모양만으로 정할 수 있습니다.</p>
+<p>모든 API는 성공하든 실패하든 <code>status</code> · <code>msg</code> · <code>body</code> 세 칸으로 된 같은 모양으로 응답합니다. 이 모양은 6장에서 만듭니다. 20장에서는 표의 API를 회원가입부터 로그아웃까지 Postman으로 차례로 호출하며 전체를 점검합니다. 그 뒤 23장에서 파일 업로드 API를 하나 더 만들고, 24장에서 이 API들을 문서로 정리합니다.</p><nav class="chapter-nav"><button type="button" class="text" data-prev="true" data-href="02.html">← 이전 장</button><span>3 / 26</span><button type="button" class="text" data-next="true" data-href="04.html">다음 장 →</button></nav></section></main></div><script src="../assets/book-6d8228e561daa8ba.js"></script></body></html>

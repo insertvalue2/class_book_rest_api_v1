@@ -1,0 +1,1297 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"><meta name="viewport" content="width=device-width,initial-scale=1"><title>스프링부트4로배우는 REST API </title><link rel="stylesheet" href="../assets/book-5206c2e7258828b8.css"></head><body><div class="reader" data-toc="open"><header class="book-bar"><button type="button" class="toc-toggle" aria-expanded="true" aria-controls="toc">목차</button><span class="book-bar__title">스프링부트4로배우는 REST API </span></header><aside class="toc" id="toc"><p class="caption">목차 / CONTENTS</p><div class="toc-title">스프링부트4로배우는 REST API </div><a href="../index.html" data-chapter="0" title="표지" aria-current="false">표지</a><a href="01.html" data-chapter="1" title="1장. Spring Boot 실행 환경" aria-current="false">1장. Spring Boot 실행 환경</a><a href="02.html" data-chapter="2" title="2장. 빈과 의존성 주입이란?" aria-current="false">2장. 빈과 의존성 주입이란?</a><a href="03.html" data-chapter="3" title="3장. REST API란?" aria-current="false">3장. REST API란?</a><a href="04.html" data-chapter="4" title="4장. 데이터베이스와 SQL이란?" aria-current="false">4장. 데이터베이스와 SQL이란?</a><a href="05.html" data-chapter="5" title="5장. JPA 엔티티란?" aria-current="false">5장. JPA 엔티티란?</a><a href="06.html" data-chapter="6" title="6장. REST API 계층 구조란?" aria-current="false">6장. REST API 계층 구조란?</a><a href="07.html" data-chapter="7" title="7장. 예외 처리란?" aria-current="false">7장. 예외 처리란?</a><a href="08.html" data-chapter="8" title="8장. 페이징이란?" aria-current="false">8장. 페이징이란?</a><a href="09.html" data-chapter="9" title="9장. Spring Security란?" aria-current="false">9장. Spring Security란?</a><a href="10.html" data-chapter="10" title="10장. 비밀번호 암호화란?" aria-current="false">10장. 비밀번호 암호화란?</a><a href="11.html" data-chapter="11" title="11장. 입력값 검증이란?" aria-current="true">11장. 입력값 검증이란?</a><a href="12.html" data-chapter="12" title="12장. JWT란?" aria-current="false">12장. JWT란?</a><a href="13.html" data-chapter="13" title="13장. CORS란?" aria-current="false">13장. CORS란?</a><a href="14.html" data-chapter="14" title="14장. 인증 필터란?" aria-current="false">14장. 인증 필터란?</a><a href="15.html" data-chapter="15" title="15장. 인가란?" aria-current="false">15장. 인가란?</a><a href="16.html" data-chapter="16" title="16장. 양방향 연관관계란?" aria-current="false">16장. 양방향 연관관계란?</a><a href="17.html" data-chapter="17" title="17장. 내 글 표시와 내 정보 수정" aria-current="false">17장. 내 글 표시와 내 정보 수정</a><a href="18.html" data-chapter="18" title="18장. 역할 기반 접근 제어란?" aria-current="false">18장. 역할 기반 접근 제어란?</a><a href="19.html" data-chapter="19" title="19장. 리프레시 토큰이란?" aria-current="false">19장. 리프레시 토큰이란?</a><a href="20.html" data-chapter="20" title="20장. 블로그 API 완성 점검" aria-current="false">20장. 블로그 API 완성 점검</a><a href="21.html" data-chapter="21" title="21장. 프로필이란?" aria-current="false">21장. 프로필이란?</a><a href="22.html" data-chapter="22" title="22장. 환경 변수란?" aria-current="false">22장. 환경 변수란?</a><a href="23.html" data-chapter="23" title="23장. 파일 업로드란?" aria-current="false">23장. 파일 업로드란?</a><a href="24.html" data-chapter="24" title="24장. API 문서란?" aria-current="false">24장. API 문서란?</a><a href="25.html" data-chapter="25" title="25장. 단위 테스트란?" aria-current="false">25장. 단위 테스트란?</a><a href="26.html" data-chapter="26" title="26장. 통합 테스트란?" aria-current="false">26장. 통합 테스트란?</a><footer>26장</footer></aside><main class="reading"><section class="chapter" id="chapter-11"><div class="eyebrow">스프링부트4로배우는 REST API  / CHAPTER 11</div><span class="chapter-num" aria-hidden="true">11</span><h2>11장. 입력값 검증이란?</h2><h3>1. Bean Validation</h3>
+<p>10장에서 만든 회원가입 API는 들어온 값을 그대로 저장합니다. 유저네임이 두 글자여도, 이메일 자리에 <code>abc</code>를 넣어도 가입됩니다. <code>username</code> 키를 빼고 보내면 <code>null</code>이 DB까지 내려가고, <code>nullable = false</code> 제약 조건에 걸려 500 오류로 끝납니다. 이런 일을 막으려면 서버가 저장하기 전에 클라이언트가 보낸 값이 규칙에 맞는지 확인해야 합니다.</p>
+<p><strong>입력값 검증(validation)</strong>은 요청으로 들어온 값이 정해 둔 규칙에 맞는지 확인하고, 맞지 않으면 처리를 멈추는 일입니다. 자바에는 이 규칙을 애너테이션으로 적는 표준이 있는데, 이를 <strong>Bean Validation(빈 검증)</strong>이라고 합니다. 패키지 이름은 <code>jakarta.validation</code>입니다.</p>
+<h4>1.1 starter-validation 추가</h4>
+<p>Bean Validation은 규칙을 적는 애너테이션과 인터페이스만 정해 둔 명세입니다. 값을 실제로 검사하는 일은 구현체가 맡습니다. 가장 널리 쓰이는 구현체는 <strong>Hibernate Validator(하이버네이트 밸리데이터)</strong>입니다. Spring Boot에서는 <code>spring-boot-starter-validation</code> 스타터 하나만 추가하면 명세와 구현체가 함께 들어옵니다. 검증기(Validator)를 빈으로 등록하는 일은 자동 설정이 맡습니다.</p>
+<p>웹 스타터 <code>spring-boot-starter-webmvc</code>에는 검증 기능이 없습니다. 검증 스타터를 추가하지 않으면 <code>jakarta.validation.constraints</code> 패키지를 찾지 못해 컴파일 단계에서 실패합니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="groovy"><div class="code-label"><span class="code-label__name">GROOVY</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3</div><pre><code data-code="dependencies {
+    implementation &#x27;org.springframework.boot:spring-boot-starter-validation&#x27;
+}">dependencies {
+    implementation &#x27;org.springframework.boot:spring-boot-starter-validation&#x27;
+}</code></pre></div></div>
+<p>의존성을 바꾼 뒤에는 Load Gradle Changes로 Gradle을 새로 고치고 서버를 다시 시작합니다. devtools의 자동 재시작은 소스 코드 변경만 반영하고, 새 라이브러리는 불러오지 않기 때문입니다.</p>
+<h4>1.2 @NotBlank · @Size · @Email</h4>
+<p>검사 규칙은 DTO의 필드 앞에 애너테이션으로 붙입니다. record라면 구성 요소 앞에 붙입니다. Bean Validation에서는 이 애너테이션도 <strong>제약 조건(constraint)</strong>이라고 부릅니다. 4장에서 본 DB의 제약 조건과 같은 말이지만, 여기서는 DB가 아니라 요청 단계에서 값을 검사합니다. 회원가입에는 다음 세 가지를 씁니다.</p>
+<table><thead><tr><th>애너테이션</th><th>검사 내용</th><th><code>null</code></th><th><code>&quot;&quot;</code></th><th><code>&quot;  &quot;</code>(공백만)</th></tr></thead><tbody><tr><td><code>@NotBlank</code></td><td>공백을 뺀 글자가 하나 이상인 문자열</td><td>실패</td><td>실패</td><td>실패</td></tr><tr><td><code>@Size(min, max)</code></td><td>글자 수가 min 이상 max 이하</td><td>통과</td><td>min이 1 이상이면 실패</td><td>글자 수로 판단</td></tr><tr><td><code>@Email</code></td><td>이메일 형식</td><td>통과</td><td>통과</td><td>실패</td></tr></tbody></table>
+<p>표에서 눈여겨볼 곳은 <code>null</code> 열입니다. <code>@Size</code>와 <code>@Email</code>은 <code>null</code>을 통과시킵니다. Bean Validation의 제약 조건은 대부분 &quot;값이 있다면 이 규칙을 지켜야 한다&quot;는 뜻이기 때문입니다. 값이 반드시 있어야 한다는 규칙은 <code>@NotNull</code>이나 <code>@NotBlank</code>가 따로 맡습니다. 그래서 꼭 받아야 하는 문자열에는 <code>@NotBlank</code>를 함께 붙입니다.</p>
+<p><code>@Email</code>의 형식 검사는 느슨합니다. <code>@</code> 앞뒤의 모양만 보므로 <code>ssar@nate</code>처럼 점이 없는 주소도 통과합니다. 실제로 있는 주소인지 알려면 인증 메일 같은 별도 절차가 필요합니다.</p>
+<p>검사에 실패했을 때 돌려줄 문장은 <code>message</code> 속성에 적습니다. 적지 않으면 Hibernate Validator의 기본 메시지가 쓰입니다. 클라이언트가 화면에 그대로 보여 줄 수 있도록 문장을 직접 적어 둡니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-java" data-code="public record 요청DTO(
+        @NotBlank(message = &quot;메시지&quot;)
+        @Size(min = 최소, max = 최대, message = &quot;메시지&quot;)
+        String 필드명) {
+}"><span class="token keyword">public</span> <span class="token keyword">record</span> 요청<span class="token function">DTO</span><span class="token punctuation">(</span>
+        <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"메시지"</span><span class="token punctuation">)</span>
+        <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> 최소<span class="token punctuation">,</span> max <span class="token operator">=</span> 최대<span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"메시지"</span><span class="token punctuation">)</span>
+        <span class="token class-name">String</span> 필드명<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>예제에서 쓸 <code>@Size(max = 20)</code>은 5장 <code>User</code> 엔티티의 <code>@Column(length = 20)</code>과 같은 숫자입니다. 엔티티의 길이 제약은 DB 테이블의 열 크기를 정합니다. DTO의 제약 조건은 그보다 앞에서, 규칙에 어긋난 값이 DB에 닿기 전에 막습니다. 두 숫자가 다르면 DTO 검사는 통과했는데 DB 저장에서 실패하는 일이 생깁니다. 그러니 두 숫자를 맞춰 둡니다.</p>
+<h4>1.3 @Valid</h4>
+<p>DTO에 제약 조건을 붙이기만 해서는 검사가 일어나지 않습니다. 컨트롤러 메서드의 파라미터 앞에 <code>@Valid</code>를 붙여야 스프링이 검증기를 호출합니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3</div><pre><code class="language-java" data-code="@PostMapping(&quot;/주소&quot;)
+public ResponseEntity&lt;?&gt; 메서드명(@Valid @RequestBody 요청DTO reqDTO) {
+}"><span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/주소"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> 메서드명<span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> 요청<span class="token class-name">DTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<figure class="book-figure" data-type="generated" id="figure-d5aaaa2cda84"><div class="figure-scroll"><img src="../assets/img/979086ac786c5ddb.png" alt="컨트롤러에 닿기 전에 멈추는 요청" data-raster="true"/></div><figcaption>컨트롤러에 닿기 전에 멈추는 요청</figcaption></figure>
+<p>그림 11-1에서 보듯 스프링은 먼저 요청 본문의 JSON을 Jackson으로 <code>JoinDTO</code> 객체로 바꿉니다. 그 직후 <code>@Valid</code>를 보고 검증기를 실행합니다. 규칙에 어긋난 값이 하나라도 있으면 <code>MethodArgumentNotValidException</code>을 던지고, <code>join()</code> 메서드 본문은 실행하지 않습니다. 그래서 잘못된 값은 Service와 Repository까지 내려가지 않습니다.</p>
+<p><strong>예제 11-1 — 회원가입 입력값 검사하기</strong></p>
+<p><strong>이어서:</strong> 예제 10-3</p>
+<p><strong>파일명:</strong> <code>build.gradle</code></p>
+<div class="code-wrap" data-kind="code" data-lang="groovy"><div class="code-label"><span class="code-label__name">GROOVY</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</div><pre><code data-code="plugins {
+    id &#x27;java&#x27;
+    id &#x27;org.springframework.boot&#x27; version &#x27;4.1.3&#x27;
+    id &#x27;io.spring.dependency-management&#x27; version &#x27;1.1.7&#x27;
+}
+
+group = &#x27;com.newtenco&#x27;
+version = &#x27;0.0.1-SNAPSHOT&#x27;
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation &#x27;org.springframework.boot:spring-boot-h2console&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-data-jpa&#x27;
+    // 스프링 시큐리티: 넣기만 해도 모든 주소가 잠긴다. 기본 설정은 SecurityConfig에서 바꾼다
+    implementation &#x27;org.springframework.boot:spring-boot-starter-security&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-validation&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-webmvc&#x27;
+    compileOnly &#x27;org.projectlombok:lombok&#x27;
+    developmentOnly &#x27;org.springframework.boot:spring-boot-devtools&#x27;
+    runtimeOnly &#x27;com.h2database:h2&#x27;
+    annotationProcessor &#x27;org.projectlombok:lombok&#x27;
+
+    // 테스트 (src/test 폴더에서만 사용)
+    testImplementation &#x27;org.springframework.boot:spring-boot-starter-data-jpa-test&#x27;
+    testImplementation &#x27;org.springframework.boot:spring-boot-starter-webmvc-test&#x27;
+    testRuntimeOnly &#x27;org.junit.platform:junit-platform-launcher&#x27;
+}
+
+tasks.named(&#x27;test&#x27;) {
+    useJUnitPlatform()   // 테스트를 JUnit으로 실행
+}">plugins {
+    id &#x27;java&#x27;
+    id &#x27;org.springframework.boot&#x27; version &#x27;4.1.3&#x27;
+    id &#x27;io.spring.dependency-management&#x27; version &#x27;1.1.7&#x27;
+}
+
+group = &#x27;com.newtenco&#x27;
+version = &#x27;0.0.1-SNAPSHOT&#x27;
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation &#x27;org.springframework.boot:spring-boot-h2console&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-data-jpa&#x27;
+    // 스프링 시큐리티: 넣기만 해도 모든 주소가 잠긴다. 기본 설정은 SecurityConfig에서 바꾼다
+    implementation &#x27;org.springframework.boot:spring-boot-starter-security&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-validation&#x27;
+    implementation &#x27;org.springframework.boot:spring-boot-starter-webmvc&#x27;
+    compileOnly &#x27;org.projectlombok:lombok&#x27;
+    developmentOnly &#x27;org.springframework.boot:spring-boot-devtools&#x27;
+    runtimeOnly &#x27;com.h2database:h2&#x27;
+    annotationProcessor &#x27;org.projectlombok:lombok&#x27;
+
+    // 테스트 (src/test 폴더에서만 사용)
+    testImplementation &#x27;org.springframework.boot:spring-boot-starter-data-jpa-test&#x27;
+    testImplementation &#x27;org.springframework.boot:spring-boot-starter-webmvc-test&#x27;
+    testRuntimeOnly &#x27;org.junit.platform:junit-platform-launcher&#x27;
+}
+
+tasks.named(&#x27;test&#x27;) {
+    useJUnitPlatform()   // 테스트를 JUnit으로 실행
+}</code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserRequest.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class UserRequest {
+
+    public record JoinDTO(
+            @NotBlank(message = &quot;유저네임을 입력해주세요&quot;)
+            @Size(min = 4, max = 20, message = &quot;유저네임은 4~20자여야 합니다&quot;)
+            String username,
+
+            @NotBlank(message = &quot;비밀번호를 입력해주세요&quot;)
+            @Size(min = 4, max = 20, message = &quot;비밀번호는 4~20자여야 합니다&quot;)
+            String password,
+
+            @NotBlank(message = &quot;이메일을 입력해주세요&quot;)
+            @Email(message = &quot;이메일 형식이 올바르지 않습니다&quot;)
+            String email) {
+
+        public User toEntity(String encPassword) {
+            return User.builder()
+                    .username(username)
+                    .password(encPassword)
+                    .email(email)
+                    .build();
+        }
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">Email</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">NotBlank</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span>constraints<span class="token punctuation">.</span></span><span class="token class-name">Size</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserRequest</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">JoinDTO</span><span class="token punctuation">(</span>
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"유저네임을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">,</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"유저네임은 4~20자여야 합니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> username<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"비밀번호를 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Size</span><span class="token punctuation">(</span>min <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">,</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">,</span> message <span class="token operator">=</span> <span class="token string">"비밀번호는 4~20자여야 합니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> password<span class="token punctuation">,</span>
+
+            <span class="token annotation punctuation">@NotBlank</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"이메일을 입력해주세요"</span><span class="token punctuation">)</span>
+            <span class="token annotation punctuation">@Email</span><span class="token punctuation">(</span>message <span class="token operator">=</span> <span class="token string">"이메일 형식이 올바르지 않습니다"</span><span class="token punctuation">)</span>
+            <span class="token class-name">String</span> email<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token class-name">User</span> <span class="token function">toEntity</span><span class="token punctuation">(</span><span class="token class-name">String</span> encPassword<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token class-name">User</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">email</span><span class="token punctuation">(</span>email<span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.util.Resp;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    @PostMapping(&quot;/join&quot;)
+    public ResponseEntity&lt;?&gt; join(@Valid @RequestBody UserRequest.JoinDTO reqDTO) {
+        return Resp.ok(userService.회원가입(reqDTO));
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">Valid</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">PostMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestBody</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserService</span> userService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/join"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">join</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>회원가입<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>Gradle을 새로 고치고 서버를 다시 시작합니다. Postman에서 <code>POST http://localhost:8080/join</code>을 고르고, Body 탭의 raw · JSON에 유저네임이 두 글자인 요청을 넣어 보냅니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;username&quot;: &quot;ab&quot;,
+  &quot;password&quot;: &quot;1234&quot;,
+  &quot;email&quot;: &quot;ab@nate.com&quot;
+}"><span class="token punctuation">{</span>
+  <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ab"</span><span class="token punctuation">,</span>
+  <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"1234"</span><span class="token punctuation">,</span>
+  <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"ab@nate.com"</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>상태 코드 400과 함께 다음 응답이 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;Bad Request&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Bad Request"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>가입은 막혔지만 메시지는 <code>Bad Request</code>뿐입니다. 이 응답은 7장에서 만든 <code>exUnknown()</code>이 보낸 것입니다. <code>MethodArgumentNotValidException</code>은 스프링이 상태 코드를 미리 정해 둔 예외로, <code>ErrorResponse</code>를 구현합니다. <code>exUnknown()</code>은 이런 예외를 받으면 원래 상태 코드 400과 기본 문구를 돌려줍니다. 그래서 어떤 값이 왜 틀렸는지는 아직 알 수 없습니다.</p>
+<p><code>username</code>을 <code>&quot;love&quot;</code>로, <code>email</code>을 <code>&quot;love@nate.com&quot;</code>으로 바꿔 다시 보내면 상태 코드 200과 함께 가입된 회원 정보가 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 200,
+  &quot;msg&quot;: &quot;성공&quot;,
+  &quot;body&quot;: {
+    &quot;id&quot;: 3,
+    &quot;username&quot;: &quot;love&quot;,
+    &quot;email&quot;: &quot;love@nate.com&quot;
+  }
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"성공"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"id"</span><span class="token operator">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+    <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"love"</span><span class="token punctuation">,</span>
+    <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"love@nate.com"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>id</code>가 3인 것은 <code>data.sql</code>이 넣은 <code>ssar</code>와 <code>cos</code>가 이미 1번과 2번을 쓰고 있기 때문입니다.</p>
+<h3>2. 검증 실패 응답</h3>
+<h4>2.1 MethodArgumentNotValidException</h4>
+<p><code>MethodArgumentNotValidException</code>은 <code>@Valid</code>를 붙인 파라미터가 검증에 실패했을 때 스프링 MVC가 던지는 예외입니다. 이 예외 안에는 검증 결과를 담은 <code>BindingResult</code>가 있습니다. <code>BindingResult</code>에서는 실패한 필드마다 하나씩 만들어진 <strong>FieldError(필드 오류)</strong>를 꺼낼 수 있습니다.</p>
+<table><thead><tr><th>메서드</th><th>돌려주는 것</th></tr></thead><tbody><tr><td><code>e.getBindingResult()</code></td><td>검증 결과 전체(<code>BindingResult</code>)</td></tr><tr><td><code>getFieldErrors()</code></td><td>실패한 필드 오류 목록(<code>List&lt;FieldError&gt;</code>)</td></tr><tr><td><code>fe.getField()</code></td><td>실패한 필드 이름(예: <code>username</code>)</td></tr><tr><td><code>fe.getDefaultMessage()</code></td><td>제약 조건의 <code>message</code>에 적은 문장</td></tr></tbody></table>
+<p><code>GlobalExceptionHandler</code>에 이 예외를 처리하는 메서드를 더하면 <code>Bad Request</code> 대신 <code>message</code>에 적은 문장을 돌려줄 수 있습니다. <code>Exception</code>을 처리하는 <code>exUnknown()</code>이 이미 있어도 괜찮습니다. 스프링은 던져진 예외와 상속 관계가 가장 가까운 <code>@ExceptionHandler</code>를 고르기 때문입니다. 따라서 <code>MethodArgumentNotValidException</code>은 새로 만든 메서드가 처리합니다.</p>
+<h4>2.2 첫 번째 오류 메시지 돌려주기</h4>
+<p>여러 필드가 한꺼번에 틀릴 수도 있습니다. 이 책은 그중 첫 번째 오류 메시지 하나만 <code>msg</code>에 담습니다. <code>Resp</code>의 <code>msg</code>는 문자열 하나이므로, 메시지를 하나만 담으면 응답 모양을 바꾸지 않아도 됩니다. 사용자는 메시지를 보고 하나씩 고쳐 다시 보내면 됩니다.</p>
+<p>목록의 첫 번째 요소는 Java 21에서 <code>List</code>에 추가된 <code>getFirst()</code>로 꺼냅니다.</p>
+<p><strong>예제 11-2 — 검증 실패 메시지 돌려주기</strong></p>
+<p><strong>이어서:</strong> 예제 11-1</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/handler/GlobalExceptionHandler.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.handler;
+
+import com.newtenco.blog.core.handler.errors.NotFoundException;
+import com.newtenco.blog.core.util.Resp;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;?&gt; validation(MethodArgumentNotValidException e) {
+        FieldError fe = e.getBindingResult().getFieldErrors().getFirst();
+        return Resp.fail(HttpStatus.BAD_REQUEST, fe.getDefaultMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity&lt;?&gt; ex404(NotFoundException e) {
+        return Resp.fail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;?&gt; exUnknown(Exception e) {
+        if (e instanceof ErrorResponse er) {
+            HttpStatus status = HttpStatus.valueOf(er.getStatusCode().value());
+            return Resp.fail(status, status.getReasonPhrase());
+        }
+        log.error(&quot;예상하지 못한 오류&quot;, e);
+        return Resp.fail(HttpStatus.INTERNAL_SERVER_ERROR, &quot;관리자에게 문의하세요&quot;);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">NotFoundException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span>extern<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">Slf4j</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpStatus</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">FieldError</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span></span><span class="token class-name">ErrorResponse</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span></span><span class="token class-name">MethodArgumentNotValidException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">ExceptionHandler</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestControllerAdvice</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Slf4j</span>
+<span class="token annotation punctuation">@RestControllerAdvice</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">GlobalExceptionHandler</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">validation</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">FieldError</span> fe <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">getBindingResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFieldErrors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFirst</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> fe<span class="token punctuation">.</span><span class="token function">getDefaultMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex404</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">NOT_FOUND</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">Exception</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">exUnknown</span><span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>e <span class="token keyword">instanceof</span> <span class="token class-name">ErrorResponse</span> er<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">HttpStatus</span> status <span class="token operator">=</span> <span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>er<span class="token punctuation">.</span><span class="token function">getStatusCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span>status<span class="token punctuation">,</span> status<span class="token punctuation">.</span><span class="token function">getReasonPhrase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"예상하지 못한 오류"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">INTERNAL_SERVER_ERROR</span><span class="token punctuation">,</span> <span class="token string">"관리자에게 문의하세요"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>예제 11-1과 같은 요청(<code>&quot;username&quot;: &quot;ab&quot;</code>)을 다시 보내면 상태 코드 400과 함께 <code>@Size</code>에 적은 메시지가 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;유저네임은 4~20자여야 합니다&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"유저네임은 4~20자여야 합니다"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>이번에는 <code>username</code>을 <code>&quot;love2&quot;</code>로 고치고 <code>email</code>만 <code>&quot;abc&quot;</code>로 바꿔 보냅니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;이메일 형식이 올바르지 않습니다&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"이메일 형식이 올바르지 않습니다"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<figure class="book-figure" data-type="generated" id="figure-d5a781506b10"><div class="figure-scroll"><img src="../assets/img/4cb2fa840addff03.png" alt="Postman에서 POST http://localhost:8080/join에 &quot;email&quot;: &quot;abc&quot;를 담아 보낸 화면" data-raster="true"/></div><figcaption>Postman에서 POST http://localhost:8080/join에 &quot;email&quot;: &quot;abc&quot;를 담아 보낸 화면</figcaption><p class="credit">생성형 예시 · 실제 실행 안 함</p></figure>
+<p>어떤 오류가 첫 번째가 될지는 정해져 있지 않습니다. Hibernate Validator가 실패한 제약 조건을 순서 없는 집합(<code>Set</code>)으로 모아 돌려주기 때문입니다. 예를 들어 <code>&quot;username&quot;: &quot;&quot;</code>을 보내면 <code>@NotBlank</code>와 <code>@Size</code>가 함께 실패합니다. 이때 두 메시지 중 무엇이 앞에 올지는 실행할 때마다 다를 수 있습니다. 위 실행 결과에서 제약 조건 하나만 실패하는 값을 고른 것도 응답이 늘 같게 나오도록 하기 위해서입니다. 어느 메시지가 오든 틀린 값을 알려 준다는 목적은 같으므로, 이 책에서는 순서를 따로 정하지 않습니다.</p>
+<h3>3. 규칙 검사와 400 응답</h3>
+<h4>3.1 BadRequestException</h4>
+<p>Bean Validation은 값 하나만 보고 판단할 수 있는 규칙에 알맞습니다. 글자 수나 이메일 형식은 요청에 들어온 값만 보면 알 수 있습니다. &quot;이미 가입된 유저네임인가&quot;는 다릅니다. DB를 조회해야 알 수 있으므로 애너테이션으로 적을 수 없습니다. 이런 규칙은 Service에서 직접 검사하고, 어기면 예외를 던집니다.</p>
+<p>이때 던질 사용자 정의 예외 <code>BadRequestException</code>을 7장의 <code>NotFoundException</code>과 같은 방식으로 만듭니다. 클라이언트의 요청이 잘못되었다는 뜻의 예외이고, 전역 예외 처리에서 400으로 바꿔 응답합니다. 이렇게 하면 형식 검사(<code>@Valid</code>)에서 걸리든 규칙 검사(Service)에서 걸리든 클라이언트는 같은 모양의 400 응답을 받습니다.</p>
+<p><strong>예제 11-3 — 400 예외와 처리기 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 11-2</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/handler/errors/BadRequestException.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.handler.errors;
+
+public class BadRequestException extends RuntimeException {
+
+    public BadRequestException(String message) {
+        super(message);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BadRequestException</span> <span class="token keyword">extends</span> <span class="token class-name">RuntimeException</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">BadRequestException</span><span class="token punctuation">(</span><span class="token class-name">String</span> message<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>message<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/handler/GlobalExceptionHandler.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.handler;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import com.newtenco.blog.core.handler.errors.NotFoundException;
+import com.newtenco.blog.core.util.Resp;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;?&gt; validation(MethodArgumentNotValidException e) {
+        FieldError fe = e.getBindingResult().getFieldErrors().getFirst();
+        return Resp.fail(HttpStatus.BAD_REQUEST, fe.getDefaultMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity&lt;?&gt; ex400(BadRequestException e) {
+        return Resp.fail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity&lt;?&gt; ex404(NotFoundException e) {
+        return Resp.fail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;?&gt; exUnknown(Exception e) {
+        if (e instanceof ErrorResponse er) {
+            HttpStatus status = HttpStatus.valueOf(er.getStatusCode().value());
+            return Resp.fail(status, status.getReasonPhrase());
+        }
+        log.error(&quot;예상하지 못한 오류&quot;, e);
+        return Resp.fail(HttpStatus.INTERNAL_SERVER_ERROR, &quot;관리자에게 문의하세요&quot;);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">NotFoundException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span>extern<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">Slf4j</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpStatus</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">FieldError</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span></span><span class="token class-name">ErrorResponse</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span></span><span class="token class-name">MethodArgumentNotValidException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">ExceptionHandler</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestControllerAdvice</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Slf4j</span>
+<span class="token annotation punctuation">@RestControllerAdvice</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">GlobalExceptionHandler</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">validation</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">FieldError</span> fe <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">getBindingResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFieldErrors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFirst</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> fe<span class="token punctuation">.</span><span class="token function">getDefaultMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">BadRequestException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex400</span><span class="token punctuation">(</span><span class="token class-name">BadRequestException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex404</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">NOT_FOUND</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">Exception</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">exUnknown</span><span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>e <span class="token keyword">instanceof</span> <span class="token class-name">ErrorResponse</span> er<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">HttpStatus</span> status <span class="token operator">=</span> <span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>er<span class="token punctuation">.</span><span class="token function">getStatusCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span>status<span class="token punctuation">,</span> status<span class="token punctuation">.</span><span class="token function">getReasonPhrase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"예상하지 못한 오류"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">INTERNAL_SERVER_ERROR</span><span class="token punctuation">,</span> <span class="token string">"관리자에게 문의하세요"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>아직 <code>BadRequestException</code>을 던지는 코드가 없으므로 API 응답은 예제 11-2와 같습니다. 서버가 오류 없이 다시 시작되는지만 확인합니다.</p>
+<p><code>BadRequestException</code>이 <code>RuntimeException</code>을 상속하는 이유는 <code>NotFoundException</code>과 같습니다. 언체크 예외라서 Service 메서드에 <code>throws</code>를 적지 않아도 됩니다. 또 <code>@Transactional</code> 메서드 안에서 던져지면 트랜잭션이 롤백됩니다.</p>
+<h4>3.2 쿼리 메서드 existsByUsername</h4>
+<p>유저네임이 이미 있는지 알려면 <code>user_tb</code>에서 그 유저네임을 찾아봐야 합니다. Spring Data JPA에서는 이런 단순 조회를 JPQL 없이 메서드 이름만으로 만들 수 있습니다. 이름 규칙을 따라 선언한 이런 메서드를 <strong>쿼리 메서드(query method)</strong>라고 합니다.</p>
+<p>Spring Data JPA는 메서드 이름을 첫 번째 <code>By</code>를 기준으로 둘로 나눠 읽습니다. 앞쪽은 할 일을 정합니다. <code>find</code>는 조회, <code>count</code>는 개수, <code>exists</code>는 존재 여부, <code>delete</code>는 삭제입니다. 뒤쪽은 엔티티의 필드 이름으로 조건을 만듭니다. 그래서 <code>existsByUsername</code>은 &quot;<code>username</code> 필드가 파라미터와 같은 행이 있는가&quot;를 묻는 메서드가 됩니다.</p>
+<p><strong>기본 문법</strong></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1</div><pre><code class="language-java" data-code="boolean existsBy필드명(필드타입 값);"><span class="token keyword">boolean</span> existsBy필드명<span class="token punctuation">(</span>필드타입 값<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre></div></div>
+<p><code>By</code> 뒤에 쓰는 이름은 DB 열 이름이 아니라 엔티티의 필드 이름입니다. 대소문자를 틀려 <code>existsByUserName</code>이라고 쓰면 <code>User</code>에 <code>userName</code> 필드가 없다는 오류와 함께 서버가 시작되지 않습니다. 스프링이 서버를 시작할 때 메서드 이름을 해석해 쿼리를 만들기 때문입니다.</p>
+<p>여기서는 존재 여부만 알면 되므로 엔티티를 통째로 가져오는 <code>find</code>보다 <code>exists</code>가 알맞습니다. <code>exists</code>는 엔티티 객체를 만들지 않고, 조건에 맞는 행이 하나라도 있는지만 확인합니다.</p>
+<p>5장에서 <code>User</code> 엔티티의 <code>username</code>에 <code>@Column(unique = true)</code>를 붙였습니다. 그래서 Service가 검사하지 않아도 같은 유저네임은 DB가 막아 줍니다. 다만 그 경우에는 저장 중에 <code>DataIntegrityViolationException</code>이 터집니다. 이 예외는 <code>ErrorResponse</code>가 아니어서 <code>exUnknown()</code>이 500과 &quot;관리자에게 문의하세요&quot;로 응답합니다. 사용자가 입력을 잘못했는데 서버 오류처럼 보이는 것입니다. Service에서 먼저 검사하면 400과 이유가 담긴 메시지를 돌려줄 수 있습니다.</p>
+<p>DB의 유니크 제약은 지우지 않고 그대로 둡니다. 두 요청이 거의 동시에 같은 유저네임으로 들어오면 둘 다 Service 검사를 통과할 수 있습니다. 그때 마지막으로 막아 주는 것이 DB 제약입니다.</p>
+<p><strong>예제 11-4 — 같은 유저네임 가입 막기</strong></p>
+<p><strong>이어서:</strong> 예제 11-3</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserRepository.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository&lt;User, Integer&gt; {
+
+    boolean existsByUsername(String username);
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>data<span class="token punctuation">.</span>jpa<span class="token punctuation">.</span>repository<span class="token punctuation">.</span></span><span class="token class-name">JpaRepository</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">UserRepository</span> <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">User</span><span class="token punctuation">,</span> <span class="token class-name">Integer</span><span class="token punctuation">></span></span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">boolean</span> <span class="token function">existsByUsername</span><span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserService.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
+        if (userRepository.existsByUsername(reqDTO.username())) {
+            throw new BadRequestException(&quot;이미 존재하는 유저네임입니다&quot;);
+        }
+        // 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다
+        // 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다
+        String encPassword = passwordEncoder.encode(reqDTO.password());
+        User savedUser = userRepository.save(reqDTO.toEntity(encPassword));
+        return new UserResponse.DTO(savedUser);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>crypto<span class="token punctuation">.</span>password<span class="token punctuation">.</span></span><span class="token class-name">PasswordEncoder</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>transaction<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Transactional</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@Transactional</span><span class="token punctuation">(</span>readOnly <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserService</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserRepository</span> userRepository<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">PasswordEncoder</span> passwordEncoder<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Transactional</span>
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token constant">DTO</span> 회원가입<span class="token punctuation">(</span><span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">BadRequestException</span><span class="token punctuation">(</span><span class="token string">"이미 존재하는 유저네임입니다"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다</span>
+        <span class="token comment">// 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다</span>
+        <span class="token class-name">String</span> encPassword <span class="token operator">=</span> passwordEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">User</span> savedUser <span class="token operator">=</span> userRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">toEntity</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token function">DTO</span><span class="token punctuation">(</span>savedUser<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p><code>data.sql</code>로 이미 들어 있는 <code>ssar</code>로 가입을 요청합니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;username&quot;: &quot;ssar&quot;,
+  &quot;password&quot;: &quot;1234&quot;,
+  &quot;email&quot;: &quot;ssar@nate.com&quot;
+}"><span class="token punctuation">{</span>
+  <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"ssar"</span><span class="token punctuation">,</span>
+  <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"1234"</span><span class="token punctuation">,</span>
+  <span class="token property">"email"</span><span class="token operator">:</span> <span class="token string">"ssar@nate.com"</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>상태 코드 400과 함께 다음 응답이 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;이미 존재하는 유저네임입니다&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"이미 존재하는 유저네임입니다"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>콘솔에는 <code>user_tb</code>를 조회하는 <code>select</code> 문만 찍히고 <code>insert</code> 문은 나오지 않습니다. 중복 검사를 비밀번호 암호화보다 앞에 둔 데에도 이유가 있습니다. BCrypt 해시는 일부러 느리게 만든 계산입니다. 어차피 거절할 요청에 그 비용을 쓸 필요가 없습니다.</p>
+<h3>4. 아이디 중복 확인 API</h3>
+<p>회원가입 화면은 가입 버튼을 누르기 전에 &quot;사용할 수 있는 유저네임입니다&quot;를 미리 보여 주는 경우가 많습니다. 이를 위해 유저네임 하나를 받아 사용할 수 있는지만 알려 주는 API를 만듭니다. 3절의 <code>existsByUsername</code>을 그대로 쓰고, 결과를 뒤집어 &quot;사용 가능한가&quot;로 돌려줍니다.</p>
+<table><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td>주소</td><td><code>GET /check-username?username=유저네임</code></td></tr><tr><td>성공 응답 <code>body</code></td><td><code>{&quot;available&quot;: true}</code> 또는 <code>{&quot;available&quot;: false}</code></td></tr></tbody></table>
+<p><code>boolean</code> 값을 <code>body</code>에 바로 넣지 않고 <code>AvailableDTO</code>라는 record로 감쌉니다. 그러면 <code>body</code>가 항상 이름 있는 키를 가진 JSON 객체가 되어, 클라이언트가 <code>body.available</code>처럼 읽을 수 있습니다. 나중에 알려 줄 정보가 늘어도 record에 구성 요소만 더하면 됩니다.</p>
+<p>유저네임은 요청 본문이 아니라 주소의 쿼리 문자열로 받습니다. 조회만 하는 요청이라 <code>GET</code>을 쓰고, 값은 8장에서 쓴 <code>@RequestParam</code>으로 꺼냅니다. <code>유저네임중복체크()</code>에는 <code>@Transactional</code>을 따로 붙이지 않습니다. 클래스에 붙은 <code>@Transactional(readOnly = true)</code>가 적용되어 읽기 전용 트랜잭션에서 실행되기 때문입니다.</p>
+<p><strong>예제 11-5 — 유저네임 중복 확인 API 만들기</strong></p>
+<p><strong>이어서:</strong> 예제 11-4</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserResponse.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+public class UserResponse {
+
+    public record DTO(Integer id, String username, String email) {
+
+        public DTO(User user) {
+            this(user.getId(), user.getUsername(), user.getEmail());
+        }
+    }
+
+    public record AvailableDTO(boolean available) {
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserResponse</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">DTO</span><span class="token punctuation">(</span><span class="token class-name">Integer</span> id<span class="token punctuation">,</span> <span class="token class-name">String</span> username<span class="token punctuation">,</span> <span class="token class-name">String</span> email<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">public</span> <span class="token function">DTO</span><span class="token punctuation">(</span><span class="token class-name">User</span> user<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">(</span>user<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getUsername</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span><span class="token function">getEmail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">record</span> <span class="token class-name">AvailableDTO</span><span class="token punctuation">(</span><span class="token keyword">boolean</span> available<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserService.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UserResponse.DTO 회원가입(UserRequest.JoinDTO reqDTO) {
+        if (userRepository.existsByUsername(reqDTO.username())) {
+            throw new BadRequestException(&quot;이미 존재하는 유저네임입니다&quot;);
+        }
+        // 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다
+        // 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다
+        String encPassword = passwordEncoder.encode(reqDTO.password());
+        User savedUser = userRepository.save(reqDTO.toEntity(encPassword));
+        return new UserResponse.DTO(savedUser);
+    }
+
+    public UserResponse.AvailableDTO 유저네임중복체크(String username) {
+        boolean available = !userRepository.existsByUsername(username);
+        return new UserResponse.AvailableDTO(available);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>security<span class="token punctuation">.</span>crypto<span class="token punctuation">.</span>password<span class="token punctuation">.</span></span><span class="token class-name">PasswordEncoder</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>transaction<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Transactional</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@Transactional</span><span class="token punctuation">(</span>readOnly <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserService</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserRepository</span> userRepository<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">PasswordEncoder</span> passwordEncoder<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Transactional</span>
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token constant">DTO</span> 회원가입<span class="token punctuation">(</span><span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">username</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">BadRequestException</span><span class="token punctuation">(</span><span class="token string">"이미 존재하는 유저네임입니다"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment">// 받은 비밀번호를 BCrypt 해시로 바꾼다. 호출할 때마다 솔트가 새로 정해져 결과가 매번 다르다</span>
+        <span class="token comment">// 원래 비밀번호(1234)는 엔티티에도 DB에도 들어가지 않는다</span>
+        <span class="token class-name">String</span> encPassword <span class="token operator">=</span> passwordEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">User</span> savedUser <span class="token operator">=</span> userRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>reqDTO<span class="token punctuation">.</span><span class="token function">toEntity</span><span class="token punctuation">(</span>encPassword<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse</span><span class="token punctuation">.</span><span class="token function">DTO</span><span class="token punctuation">(</span>savedUser<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>AvailableDTO</span> 유저네임중복체크<span class="token punctuation">(</span><span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">boolean</span> available <span class="token operator">=</span> <span class="token operator">!</span>userRepository<span class="token punctuation">.</span><span class="token function">existsByUsername</span><span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserResponse<span class="token punctuation">.</span>AvailableDTO</span><span class="token punctuation">(</span>available<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/user/UserController.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</div><pre><code class="language-java" data-code="package com.newtenco.blog.user;
+
+import com.newtenco.blog.core.util.Resp;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class UserController {
+
+    private final UserService userService;
+
+    @PostMapping(&quot;/join&quot;)
+    public ResponseEntity&lt;?&gt; join(@Valid @RequestBody UserRequest.JoinDTO reqDTO) {
+        return Resp.ok(userService.회원가입(reqDTO));
+    }
+
+    @GetMapping(&quot;/check-username&quot;)
+    public ResponseEntity&lt;?&gt; checkUsername(@RequestParam(&quot;username&quot;) String username) {
+        return Resp.ok(userService.유저네임중복체크(username));
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>user</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">jakarta<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">Valid</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span></span><span class="token class-name">RequiredArgsConstructor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">GetMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">PostMapping</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestBody</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RequestParam</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestController</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@RequiredArgsConstructor</span>
+<span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">UserService</span> userService<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/join"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">join</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Valid</span> <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">UserRequest<span class="token punctuation">.</span>JoinDTO</span> reqDTO<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>회원가입<span class="token punctuation">(</span>reqDTO<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/check-username"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">checkUsername</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestParam</span><span class="token punctuation">(</span><span class="token string">"username"</span><span class="token punctuation">)</span> <span class="token class-name">String</span> username<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>userService<span class="token punctuation">.</span>유저네임중복체크<span class="token punctuation">(</span>username<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>Postman에서 <code>GET http://localhost:8080/check-username?username=ssar</code>를 보내면 이미 있는 유저네임이므로 <code>false</code>가 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 200,
+  &quot;msg&quot;: &quot;성공&quot;,
+  &quot;body&quot;: {
+    &quot;available&quot;: false
+  }
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"성공"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"available"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><code>username=hello</code>로 바꿔 보내면 <code>&quot;available&quot;: true</code>가 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 200,
+  &quot;msg&quot;: &quot;성공&quot;,
+  &quot;body&quot;: {
+    &quot;available&quot;: true
+  }
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">200</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"성공"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"available"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>중복 확인 API가 생겼다고 3절에서 <code>회원가입()</code>에 넣은 검사를 지우면 안 됩니다. 사용자가 확인 버튼을 누른 뒤 가입 버튼을 누르기 전에 다른 사람이 같은 유저네임으로 먼저 가입할 수 있습니다. 클라이언트가 확인 API를 건너뛰고 <code>/join</code>을 바로 호출할 수도 있습니다. 중복 확인 API는 사용자에게 미리 알려 주는 용도일 뿐입니다. 가입을 실제로 막는 검사는 서버의 가입 처리 안에 있어야 합니다.</p>
+<h3>5. 요청 파라미터가 빠졌을 때</h3>
+<h4>5.1 MissingServletRequestParameterException</h4>
+<p><code>@RequestParam(&quot;username&quot;)</code>의 <code>required</code> 속성은 기본값이 <code>true</code>입니다. 그래서 <code>GET /check-username</code>처럼 <code>username</code> 파라미터 없이 요청하면, 스프링은 컨트롤러 메서드를 호출하지 않고 <code>MissingServletRequestParameterException</code>을 던집니다. 8장의 <code>page</code>와 <code>keyword</code>는 <code>defaultValue</code>를 주었기 때문에 파라미터가 빠져도 기본값이 들어가 이 예외가 나지 않았습니다.</p>
+<p>이 예외도 <code>ErrorResponse</code>를 구현합니다. 그래서 지금 파라미터 없이 요청하면 <code>exUnknown()</code>이 처리하고, 다음 응답이 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;Bad Request&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"Bad Request"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>상태 코드는 맞지만 무엇이 빠졌는지는 알 수 없습니다. 이 예외의 <code>getParameterName()</code>은 빠진 파라미터의 이름을 돌려줍니다. 이 이름을 메시지에 넣는 처리 메서드를 더합니다.</p>
+<p><strong>예제 11-6 — 빠진 요청 파라미터 알리기</strong></p>
+<p><strong>이어서:</strong> 예제 11-5</p>
+<p><strong>파일명:</strong> <code>src/main/java/com/newtenco/blog/core/handler/GlobalExceptionHandler.java</code></p>
+<div class="code-wrap" data-kind="code" data-lang="java"><div class="code-label"><span class="code-label__name">Java</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</div><pre><code class="language-java" data-code="package com.newtenco.blog.core.handler;
+
+import com.newtenco.blog.core.handler.errors.BadRequestException;
+import com.newtenco.blog.core.handler.errors.NotFoundException;
+import com.newtenco.blog.core.util.Resp;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;?&gt; validation(MethodArgumentNotValidException e) {
+        FieldError fe = e.getBindingResult().getFieldErrors().getFirst();
+        return Resp.fail(HttpStatus.BAD_REQUEST, fe.getDefaultMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity&lt;?&gt; missingParam(MissingServletRequestParameterException e) {
+        return Resp.fail(HttpStatus.BAD_REQUEST, e.getParameterName() + &quot;:값을 입력해주세요&quot;);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity&lt;?&gt; ex400(BadRequestException e) {
+        return Resp.fail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity&lt;?&gt; ex404(NotFoundException e) {
+        return Resp.fail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;?&gt; exUnknown(Exception e) {
+        if (e instanceof ErrorResponse er) {
+            HttpStatus status = HttpStatus.valueOf(er.getStatusCode().value());
+            return Resp.fail(status, status.getReasonPhrase());
+        }
+        log.error(&quot;예상하지 못한 오류&quot;, e);
+        return Resp.fail(HttpStatus.INTERNAL_SERVER_ERROR, &quot;관리자에게 문의하세요&quot;);
+    }
+}"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">BadRequestException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>errors<span class="token punctuation">.</span></span><span class="token class-name">NotFoundException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>newtenco<span class="token punctuation">.</span>blog<span class="token punctuation">.</span>core<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">Resp</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">lombok<span class="token punctuation">.</span>extern<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span></span><span class="token class-name">Slf4j</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">HttpStatus</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>http<span class="token punctuation">.</span></span><span class="token class-name">ResponseEntity</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>validation<span class="token punctuation">.</span></span><span class="token class-name">FieldError</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span></span><span class="token class-name">ErrorResponse</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span></span><span class="token class-name">MethodArgumentNotValidException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span></span><span class="token class-name">MissingServletRequestParameterException</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">ExceptionHandler</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>web<span class="token punctuation">.</span>bind<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">RestControllerAdvice</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Slf4j</span>
+<span class="token annotation punctuation">@RestControllerAdvice</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">GlobalExceptionHandler</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">validation</span><span class="token punctuation">(</span><span class="token class-name">MethodArgumentNotValidException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">FieldError</span> fe <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">getBindingResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFieldErrors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFirst</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> fe<span class="token punctuation">.</span><span class="token function">getDefaultMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">MissingServletRequestParameterException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">missingParam</span><span class="token punctuation">(</span><span class="token class-name">MissingServletRequestParameterException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getParameterName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">":값을 입력해주세요"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">BadRequestException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex400</span><span class="token punctuation">(</span><span class="token class-name">BadRequestException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">BAD_REQUEST</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">ex404</span><span class="token punctuation">(</span><span class="token class-name">NotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">NOT_FOUND</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token annotation punctuation">@ExceptionHandler</span><span class="token punctuation">(</span><span class="token class-name">Exception</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">exUnknown</span><span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>e <span class="token keyword">instanceof</span> <span class="token class-name">ErrorResponse</span> er<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token class-name">HttpStatus</span> status <span class="token operator">=</span> <span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>er<span class="token punctuation">.</span><span class="token function">getStatusCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span>status<span class="token punctuation">,</span> status<span class="token punctuation">.</span><span class="token function">getReasonPhrase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"예상하지 못한 오류"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">Resp</span><span class="token punctuation">.</span><span class="token function">fail</span><span class="token punctuation">(</span><span class="token class-name">HttpStatus</span><span class="token punctuation">.</span><span class="token constant">INTERNAL_SERVER_ERROR</span><span class="token punctuation">,</span> <span class="token string">"관리자에게 문의하세요"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p><strong>실행 결과</strong></p>
+<p>Postman에서 <code>GET http://localhost:8080/check-username</code>을 파라미터 없이 보냅니다. 상태 코드 400과 함께 빠진 파라미터 이름이 담긴 메시지가 옵니다.</p>
+<div class="code-wrap" data-kind="code" data-lang="json"><div class="code-label"><span class="code-label__name">JSON</span><div class="code-tools"><span class="copy-result" aria-live="polite"></span><button type="button" class="small copy">복사</button></div></div><div class="code-body"><div class="code-ln" aria-hidden="true">1
+2
+3
+4
+5</div><pre><code class="language-json" data-code="{
+  &quot;status&quot;: 400,
+  &quot;msg&quot;: &quot;username:값을 입력해주세요&quot;,
+  &quot;body&quot;: null
+}"><span class="token punctuation">{</span>
+  <span class="token property">"status"</span><span class="token operator">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
+  <span class="token property">"msg"</span><span class="token operator">:</span> <span class="token string">"username:값을 입력해주세요"</span><span class="token punctuation">,</span>
+  <span class="token property">"body"</span><span class="token operator">:</span> <span class="token null keyword">null</span>
+<span class="token punctuation">}</span></code></pre></div></div>
+<p>이제 <code>GlobalExceptionHandler</code>가 400으로 응답하는 경우는 세 가지입니다. 형식이 틀린 요청 본문은 <code>validation()</code>이, 빠진 쿼리 파라미터는 <code>missingParam()</code>이, Service의 규칙 위반은 <code>ex400()</code>이 처리합니다. 셋 다 <code>Resp.fail()</code>로 응답을 만듭니다. 그래서 클라이언트는 요청이 어느 단계에서 걸렸는지 몰라도 <code>msg</code>만 읽어 사용자에게 보여 주면 됩니다.</p><nav class="chapter-nav"><button type="button" class="text" data-prev="true" data-href="10.html">← 이전 장</button><span>11 / 26</span><button type="button" class="text" data-next="true" data-href="12.html">다음 장 →</button></nav></section></main></div><script src="../assets/book-6d8228e561daa8ba.js"></script></body></html>
